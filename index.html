@@ -14,13 +14,9 @@
             scroll-behavior: smooth;
         }
 
-        .gradient-bg {
-            background: linear-gradient(to right, #ffb347, #ffcc33);
-        }
-
         .glass {
             background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
@@ -44,22 +40,29 @@
 
 <body class="bg-gradient-to-b from-amber-50 via-white to-emerald-50 text-slate-800">
     <!-- Navbar -->
-    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+    <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
-            <a href="#home" class="flex items-center gap-2">
-                <img src="images/logo.png" alt="Solaris Logo" class="w-28" />
+            <a href="#home" class="flex items-center gap-3">
+                <img src="images/logo.png" alt="Solaris Logo" class="w-10 h-10 object-contain" />
+                <div class="flex flex-col leading-tight">
+                    <span class="font-bold text-lg">Solaris</span>
+                    <span class="text-xs text-slate-500">Smart Rooftop Solar</span>
+                </div>
             </a>
+
             <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-700">
                 <a href="#features" class="hover:text-amber-600 transition">Features</a>
                 <a href="#schemes" class="hover:text-amber-600 transition">Govt. Schemes</a>
                 <a href="#stats" class="hover:text-amber-600 transition">Stats</a>
                 <a href="#estimate" class="hover:text-amber-600 transition">Estimate</a>
-                <a href="#download"
+                <a id="download" href="#download"
                     class="bg-amber-400 hover:bg-amber-500 text-white px-4 py-2 rounded-md shadow transition">Download
                     App</a>
             </nav>
-            <button id="menu-btn" class="md:hidden text-slate-700 focus:outline-none">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+
+            <button id="menu-btn" aria-expanded="false" aria-controls="mobile-menu" class="md:hidden text-slate-700">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                    aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
@@ -70,7 +73,7 @@
             <a href="#schemes" class="hover:text-amber-600">Govt. Schemes</a>
             <a href="#stats" class="hover:text-amber-600">Stats</a>
             <a href="#estimate" class="hover:text-amber-600">Estimate</a>
-            <a href="#download"
+            <a id="download-mobile" href="#download"
                 class="bg-amber-400 hover:bg-amber-500 text-white px-3 py-2 rounded-md text-center">Download App</a>
         </div>
     </header>
@@ -78,20 +81,21 @@
     <!-- Hero Section -->
     <main class="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
         <div class="fade-in">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 leading-tight">
-                Bring solar energy home. <br /><span class="text-amber-500">Save money. Empower sustainability.</span>
+            <h1 id="titleText" class="text-4xl md:text-5xl font-extrabold text-slate-800 leading-tight">
+                Bring solar energy home.<br><span class="text-amber-500">Save money. Empower sustainability.</span>
             </h1>
-            <p id="subtitleText" , class="mt-5 text-slate-600 text-lg leading-relaxed">
+
+            <p id="subtitleText" class="mt-5 text-slate-600 text-lg leading-relaxed">
                 Solaris helps you understand your rooftop’s solar potential, find regional government schemes, and
                 estimate
                 your annual savings — all in your preferred language.
             </p>
 
             <div class="mt-8 flex flex-wrap gap-4">
-                <a id="download" , href="#download"
+                <a id="downloadBtn" href="#download"
                     class="bg-rose-500 hover:bg-rose-600 text-white font-medium px-5 py-3 rounded-lg shadow-md transition">Download
                     App</a>
-                <a id="estimateBtn" , href="#estimate"
+                <a id="estimateBtn" href="#estimate"
                     class="border border-slate-300 hover:border-amber-400 hover:text-amber-600 px-5 py-3 rounded-lg transition">Check
                     Estimate</a>
             </div>
@@ -99,55 +103,60 @@
 
         <!-- Form Card -->
         <div class="glass rounded-3xl p-6 md:p-8 shadow-lg fade-in">
-            <h3 id="formTitle" , class="text-lg font-semibold text-slate-800">Quick Eligibility Check</h3>
+            <h3 id="formTitle" class="text-lg font-semibold text-slate-800">Quick Eligibility Check</h3>
+            <p id="formSubtitle" class="text-sm text-slate-500 mt-1">Get a free downloadable solar eligibility report.
+            </p>
 
-            <form id="eligibilityForm" class="mt-5 space-y-4">
+            <form id="eligibilityForm" class="mt-5 space-y-4" aria-labelledby="formTitle">
                 <div>
-                    <label for="name" , class="text-xs uppercase tracking-wide">Full Name</label>
-                    <input required name="name"
+                    <label for="name" id="labelName" class="text-xs uppercase tracking-wide">Full Name</label>
+                    <input id="name" name="name" required
                         class="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-300 focus:outline-none"
                         placeholder="John Doe" />
                 </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="pincode" class="text-xs uppercase tracking-wide">PIN Code</label>
-                        <input required name="pincode" id="pincode"
+                        <label for="pincode" id="labelPincode" class="text-xs uppercase tracking-wide">PIN Code</label>
+                        <input id="pincode" name="pincode" required inputmode="numeric" pattern="\d{6}"
                             class="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-300 focus:outline-none"
                             placeholder="110001" />
                     </div>
+
                     <div>
-                        <label class="text-xs uppercase tracking-wide">DISCOM</label>
-                        <input for="discom" name="discom"
+                        <label for="discom" id="labelDiscom" class="text-xs uppercase tracking-wide">DISCOM</label>
+                        <input id="discom" name="discom"
                             class="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-300 focus:outline-none"
                             placeholder="BSES Rajdhani" />
                     </div>
                 </div>
+
                 <div>
-                    <label for="area" class="text-xs uppercase tracking-wide">Roof Area (m²)</label>
-                    <input type="number" name="area"
+                    <label for="area" id="labelArea" class="text-xs uppercase tracking-wide">Roof Area (m²)</label>
+                    <input id="area" name="area" type="number" min="0" step="0.1"
                         class="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-300 focus:outline-none"
                         placeholder="40" />
                 </div>
 
                 <div class="flex items-center gap-2">
                     <input type="checkbox" id="netmeter" name="netmeter" />
-                    <label for="netmeter" class="text-sm text-slate-600">I have / can get net-metering</label>
+                    <label for="netmeter" id="labelNetmeter" class="text-sm text-slate-600">I have / can get
+                        net-metering</label>
                 </div>
 
                 <div class="flex gap-2 mt-3">
                     <button id="reportBtn" type="submit"
-                        class="flex-1 bg-amber-400 hover:bg-amber-500 text-white px-4 py-2 rounded-lg shadow-sm transition">
-                        Get Report
-                    </button>
-                    <button id="langBtn" type="button" id="langBtn"
-                        class="flex-1 border border-slate-200 hover:border-amber-400 hover:text-amber-500 px-4 py-2 rounded-lg transition">
-                        Switch Language
-                    </button>
+                        class="flex-1 bg-amber-400 hover:bg-amber-500 text-white px-4 py-2 rounded-lg shadow-sm transition">Get
+                        Report</button>
+
+                    <button id="langBtn" type="button"
+                        class="flex-1 border border-slate-200 hover:border-amber-400 hover:text-amber-500 px-4 py-2 rounded-lg transition"
+                        aria-pressed="false">Switch Language</button>
                 </div>
             </form>
 
             <div id="resultCard" class="mt-5 hidden bg-emerald-50 border border-emerald-100 p-4 rounded-lg">
-                <h4 class="font-semibold text-emerald-800">Estimated Result</h4>
+                <h4 id="resultTitle" class="font-semibold text-emerald-800">Estimated Result</h4>
                 <p id="resultText" class="text-sm text-slate-700 mt-2 whitespace-pre-line">—</p>
             </div>
         </div>
@@ -206,7 +215,6 @@
     </footer>
 
     <script>
-
         const translations = {
             en: {
                 download: "Download App",
@@ -218,11 +226,12 @@
                 netmeter: "I have / can get net-metering",
                 report: "Get Report",
                 switch: "Switch Language",
-                title: "Bring solar energy home. Save money. Empower sustainability.",
-                subtitle:
-                    "Solaris helps you understand your rooftop’s solar potential, find regional government schemes, and estimate your annual savings — all in your preferred language.",
+                title: "Bring solar energy home.<br><span class='text-amber-500'>Save money. Empower sustainability.</span>",
+                subtitle: "Solaris helps you understand your rooftop’s solar potential, find regional government schemes, and estimate your annual savings — all in your preferred language.",
                 formTitle: "Quick Eligibility Check",
                 formSubtitle: "Get a free downloadable solar eligibility report.",
+                resultTitle: "Estimated Result",
+                invalidInput: "Please enter valid roof area and PIN code."
             },
             hi: {
                 download: "एप डाउनलोड करें",
@@ -234,11 +243,12 @@
                 netmeter: "मेरे पास नेट मीटर है / मैं प्राप्त कर सकता हूँ",
                 report: "रिपोर्ट प्राप्त करें",
                 switch: "भाषा बदलें",
-                title: "सौर ऊर्जा घर लाएं। पैसे बचाएं। सततता बढ़ाएं।",
-                subtitle:
-                    "Solaris आपकी छत की सौर क्षमता, क्षेत्रीय सरकारी योजनाएं और वार्षिक बचत का अनुमान बताता है — आपकी भाषा में।",
+                title: "सौर ऊर्जा घर लाएं।<br><span class='text-amber-500'>पैसे बचाएं। सततता बढ़ाएं।</span>",
+                subtitle: "Solaris आपकी छत की सौर क्षमता, क्षेत्रीय सरकारी योजनाएं और वार्षिक बचत का अनुमान बताता है — आपकी भाषा में।",
                 formTitle: "त्वरित पात्रता जांच",
                 formSubtitle: "निःशुल्क डाउनलोड करने योग्य सौर रिपोर्ट प्राप्त करें।",
+                resultTitle: "अनुमानित परिणाम",
+                invalidInput: "कृपया मान्य छत क्षेत्रफल और पिन कोड दर्ज करें।"
             },
             mr: {
                 download: "अ‍ॅप डाउनलोड करा",
@@ -250,85 +260,110 @@
                 netmeter: "माझ्याकडे नेट मीटर आहे / मी मिळवू शकतो",
                 report: "अहवाल मिळवा",
                 switch: "भाषा बदला",
-                title: "सौर ऊर्जा घरात आणा. पैसे वाचवा. टिकाऊपणा वाढवा.",
-                subtitle:
-                    "Solaris तुम्हाला तुमच्या छतावरील सौर क्षमतेचे, सरकारी योजना आणि वार्षिक बचतीचे अंदाज दाखवते — तुमच्या भाषेत.",
+                title: "सौर ऊर्जा घरात आणा.<br><span class='text-amber-500'>पैसे वाचवा. टिकाऊपणा वाढवा.</span>",
+                subtitle: "Solaris तुम्हाला तुमच्या छतावरील सौर क्षमतेचे, सरकारी योजना आणि वार्षिक बचतीचे अंदाज दाखवते — तुमच्या भाषेत.",
                 formTitle: "जलद पात्रता तपासणी",
                 formSubtitle: "मोफत डाउनलोड करण्यायोग्य सौर पात्रता अहवाल मिळवा.",
-            },
-        }
-
-        // detect user language
-        function detectLang() {
-            const tag = navigator.language || navigator.userLanguage || "en"
-            const code = tag.split("-")[0]
-            return translations[code] ? code : "en"
-        }
-
-        let currentLang = "en"
-
-        // apply translations
-        function applyTranslations(code) {
-            const t = translations[code]
-            document.getElementById("titleText").innerText = t.title
-            document.getElementById("subtitleText").innerText = t.subtitle
-            document.getElementById("download").innerText = t.download
-            document.getElementById("estimateBtn").innerText = t.estimate
-            document.querySelector("label[for='netmeter']").innerText = t.netmeter
-            document.querySelector("label[for='netmeter']").innerText = t.netmeter
-
-            document.querySelector("label[for='name']").innerText = t.name
-            document.querySelector("label[for='pincode']").innerText = t.pincode
-            document.querySelector("label[for='discom']").innerText = t.discom
-            document.querySelector("label[for='area']").innerText = t.area
-
-            document.getElementById("formTitle").innerText = t.formTitle
-            document.getElementById("formSubtitle").innerText = t.formSubtitle
-            document.getElementById("reportBtn").innerText = t.report
-            document.getElementById("langBtn").innerText = t.switch
-        }
-
-        // handle form submission
-        document.getElementById("eligibilityForm").addEventListener("submit", (e) => {
-            e.preventDefault()
-            const form = new FormData(e.target)
-            const area = Number(form.get("area") || 0)
-            const pincode = form.get("pincode") || ""
-            if (!area || area <= 0 || !pincode.match(/^\d{6}$/)) {
-                alert("Please enter valid roof area and PIN code.")
-                return
+                resultTitle: "अंदाजे निकाल",
+                invalidInput: "कृपया वैध छत क्षेत्रफळ आणि पिन कोड प्रविष्ट करा."
             }
-            const packingFactor = 0.7
-            const kwPerSqm = 0.17
-            const estKw = Math.max(0, area * packingFactor * kwPerSqm)
-            const annualGen = estKw * 4.5 * 365
-            const estSavings = Math.round(annualGen * 6)
+        };
 
-            const text = `Estimated installable capacity: ${estKw.toFixed(2)} kW
-Estimated annual generation: ${Math.round(annualGen)} kWh 
-Approx annual savings: ₹${estSavings}`
-            document.getElementById("resultText").innerText = text
-            document.getElementById("resultCard").classList.remove("hidden")
-        })
+        // Choose language from browser (auto-detect), fallback to en
+        function detectLang() {
+            const tag = navigator.language || navigator.userLanguage || "en";
+            const code = tag.split("-")[0];
+            return translations[code] ? code : "en";
+        }
 
-        // switch language
+        // Keep current language
+        let currentLang = detectLang();
+
+        // Apply translations to all identified elements
+        function applyTranslations(code) {
+            const t = translations[code];
+
+
+            document.getElementById("titleText").innerHTML = t.title
+            document.getElementById("subtitleText").innerText = t.subtitle;
+
+            document.getElementById("download").innerText = t.download;
+            document.getElementById("download-mobile").innerText = t.download;
+            document.getElementById("downloadBtn").innerText = t.download;
+            document.getElementById("estimateBtn").innerText = t.estimate;
+
+            document.getElementById("labelName").innerText = t.name;
+            document.getElementById("labelPincode").innerText = t.pincode;
+            document.getElementById("labelDiscom").innerText = t.discom;
+            document.getElementById("labelArea").innerText = t.area;
+            document.getElementById("labelNetmeter").innerText = t.netmeter;
+
+            document.getElementById("formTitle").innerText = t.formTitle;
+            document.getElementById("formSubtitle").innerText = t.formSubtitle;
+
+            document.getElementById("reportBtn").innerText = t.report;
+            document.getElementById("langBtn").innerText = t.switch;
+
+            document.getElementById("resultTitle").innerText = t.resultTitle;
+        }
+
+        // Cycle language: en -> hi -> mr -> en ...
+        function cycleLang() {
+            currentLang = currentLang === "en" ? "hi" : (currentLang === "hi" ? "mr" : "en");
+            applyTranslations(currentLang);
+        }
+
+        // Form submit handler (localized validation messages and localized result prefixes)
+        document.getElementById("eligibilityForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const form = new FormData(e.target);
+            const area = Number(form.get("area") || 0);
+            const pincode = String(form.get("pincode") || "");
+            const t = translations[currentLang];
+
+            if (!area || area <= 0 || !/^\d{6}$/.test(pincode)) {
+                alert(t.invalidInput);
+                return;
+            }
+
+            const packingFactor = 0.7;
+            const kwPerSqm = 0.17;
+            const estKw = Math.max(0, area * packingFactor * kwPerSqm);
+            const annualGen = estKw * 4.5 * 365;
+            const estSavings = Math.round(annualGen * 6);
+
+            // Localized numeric output (numbers remain as-is; labels use translation)
+            const lines = [
+                `${t.resultTitle}:`,
+                `• Installable Capacity: ${estKw.toFixed(2)} kW`,
+                `• Annual Generation: ${Math.round(annualGen)} kWh`,
+                `• Approx. Annual Savings: ₹${estSavings}`
+            ];
+
+            // join with newline and show
+            document.getElementById("resultText").innerText = lines.join("\n");
+            document.getElementById("resultCard").classList.remove("hidden");
+        });
+
+        // Switch language button (cycles languages)
         document.getElementById("langBtn").addEventListener("click", () => {
-            currentLang = currentLang === "en" ? "hi" : currentLang === "hi" ? "mr" : "en"
-            applyTranslations(currentLang)
-        })
+            cycleLang();
+            // update aria-pressed for accessibility
+            const btn = document.getElementById("langBtn");
+            btn.setAttribute("aria-pressed", String(btn.getAttribute("aria-pressed") !== "true"));
+        });
 
-        // mobile menu toggle
+        // Mobile menu toggle
         document.getElementById("menu-btn").addEventListener("click", () => {
-            document.getElementById("mobile-menu").classList.toggle("hidden")
-        })
+            const menu = document.getElementById("mobile-menu");
+            const expanded = menu.classList.contains("hidden") ? "true" : "false";
+            menu.classList.toggle("hidden");
+            document.getElementById("menu-btn").setAttribute("aria-expanded", expanded);
+        });
 
-        // initial setup
-        applyTranslations(detectLang())
-
-
+        // Initial apply
+        applyTranslations(currentLang);
     </script>
 </body>
-
-
 
 </html>
