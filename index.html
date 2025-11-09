@@ -4,316 +4,331 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Solaris</title>
+    <title>Solaris — Smart Rooftop Solar Estimator</title>
     <link rel="icon" type="image/png" href="images/favicon.png" />
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             font-family: 'Ubuntu', sans-serif;
+            scroll-behavior: smooth;
         }
 
         .gradient-bg {
-            background: linear-gradient(to right, #FDC830, #F37335);
+            background: linear-gradient(to right, #ffb347, #ffcc33);
         }
 
-        .section-bg {
-            background: linear-gradient(to right, #ffffff, #f0fdf4);
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .section-bg-lime {
-            background: linear-gradient(to right, #f0fdf4, #d9f99d);
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out both;
         }
 
-        .section-bg-cyan {
-            background: linear-gradient(to right, #ecfeff, #cffafe);
-        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
 
-        .section-bg-orange {
-            background: linear-gradient(to right, #fff7ed, #ffedd5);
-        }
-
-        .section-bg-purple {
-            background: linear-gradient(to right, #f3e5f5, #ede7f6);
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800">
-    <header class="bg-white shadow-md py-0.01 px-4 sticky top-0 z-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <a href="#home" class="flex items-center space-x-2">
+<body class="bg-gradient-to-b from-amber-50 via-white to-emerald-50 text-slate-800">
+    <!-- Navbar -->
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#home" class="flex items-center gap-2">
                 <img src="images/logo.png" alt="Solaris Logo" class="w-28" />
             </a>
-            <button id="menu-btn" class="md:hidden focus:outline-none">
-                <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" stroke-width="2"
-                    viewBox="0 0 24 24">
+            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-700">
+                <a href="#features" class="hover:text-amber-600 transition">Features</a>
+                <a href="#schemes" class="hover:text-amber-600 transition">Govt. Schemes</a>
+                <a href="#stats" class="hover:text-amber-600 transition">Stats</a>
+                <a href="#estimate" class="hover:text-amber-600 transition">Estimate</a>
+                <a href="#download"
+                    class="bg-amber-400 hover:bg-amber-500 text-white px-4 py-2 rounded-md shadow transition">Download
+                    App</a>
+            </nav>
+            <button id="menu-btn" class="md:hidden text-slate-700 focus:outline-none">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
-            <nav class="hidden md:flex space-x-6 text-sm font-semibold">
-                <a href="#features" class="hover:underline">Features</a>
-                <a href="#schemes" class="hover:underline">Govt. Schemes</a>
-                <a href="#stats" class="hover:underline">Stats</a>
-                <a href="#estimate" class="hover:underline">Estimate</a>
-                <a href="#download" class="bg-amber-400 hover:bg-amber-500 text-white px-3 py-2 rounded-md">Download
-                    App</a>
-            </nav>
         </div>
 
-        <div id="mobile-menu"
-            class="md:hidden hidden flex-col space-y-2 px-4 pt-4 pb-6 bg-white text-sm font-semibold shadow">
-            <a href="#features" class="hover:underline">Features</a>
-            <a href="#schemes" class="hover:underline">Govt. Schemes</a>
-            <a href="#stats" class="hover:underline">Stats</a>
-            <a href="#estimate" class="hover:underline">Estimate</a>
-            <a href="#download" class="bg-amber-400 hover:bg-amber-500 text-white px-3 py-2 rounded-md">Download App</a>
+        <div id="mobile-menu" class="md:hidden hidden flex-col bg-white/95 text-slate-800 shadow px-6 py-4 space-y-3">
+            <a href="#features" class="hover:text-amber-600">Features</a>
+            <a href="#schemes" class="hover:text-amber-600">Govt. Schemes</a>
+            <a href="#stats" class="hover:text-amber-600">Stats</a>
+            <a href="#estimate" class="hover:text-amber-600">Estimate</a>
+            <a href="#download"
+                class="bg-amber-400 hover:bg-amber-500 text-white px-3 py-2 rounded-md text-center">Download App</a>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-6 py-12">
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div>
-                <h2 class="text-3xl md:text-4xl font-extrabold">Bring solar energy home. Understand eligibility. Save money.
-                </h2>
-                <p class="mt-4 text-slate-600">Enter a few details and Solaris tells you your rooftop's solar potential,
-                    applicable government schemes in your region, and an eligibility report with a saving estimate — in
-                    your language.</p>
+    <!-- Hero Section -->
+    <main class="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
+        <div class="fade-in">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 leading-tight">
+                Bring solar energy home. <br /><span class="text-amber-500">Save money. Empower sustainability.</span>
+            </h1>
+            <p id="subtitleText" , class="mt-5 text-slate-600 text-lg leading-relaxed">
+                Solaris helps you understand your rooftop’s solar potential, find regional government schemes, and
+                estimate
+                your annual savings — all in your preferred language.
+            </p>
 
-                <div class="mt-6 flex gap-3">
-                    <a id="download" href="App_DOWNLOAD_Link"
-                        class="inline-flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white px-4 py-3 rounded-md">Download
-                        App</a>
-                    <a href="#estimate"
-                        class="inline-flex items-center gap-2 border border-slate-200 px-4 py-3 rounded-md">Check
-                        estimate</a>
-                </div>
-
-                <!-- <div class="mt-6 grid grid-cols-2 gap-3 text-sm">
-                    <div class="p-3 bg-white rounded-md shadow-sm">
-                        <div class="font-semibold">Subsidy finder</div>
-                        <div class="text-slate-500">Central + state schemes matched to your address</div>
-                    </div>
-                    <div class="p-3 bg-white rounded-md shadow-sm">
-                        <div class="font-semibold">Rooftop potential</div>
-                        <div class="text-slate-500">Area, orientation & regional irradiance</div>
-                    </div>
-                </div> -->
+            <div class="mt-8 flex flex-wrap gap-4">
+                <a id="download" , href="#download"
+                    class="bg-rose-500 hover:bg-rose-600 text-white font-medium px-5 py-3 rounded-lg shadow-md transition">Download
+                    App</a>
+                <a id="estimateBtn" , href="#estimate"
+                    class="border border-slate-300 hover:border-amber-400 hover:text-amber-600 px-5 py-3 rounded-lg transition">Check
+                    Estimate</a>
             </div>
+        </div>
 
-            <div>
-                <div class="bg-white rounded-2xl p-6 shadow-lg">
-                    <h3 class="font-semibold">Quick eligibility check</h3>
-                    <p class="text-sm text-slate-500 mt-1">Fill basic details and get a downloadable eligibility report.
-                    </p>
-                    <form id="eligibilityForm" class="mt-4 space-y-3">
-                        <div>
-                            <label class="text-xs">Full name</label>
-                            <input required name="name" class="w-full mt-1 px-3 py-2 rounded border"
-                                placeholder="Asha Kumar" />
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="text-xs">PIN code</label>
-                                <input required name="pincode" id="pincode" class="w-full mt-1 px-3 py-2 rounded border"
-                                    placeholder="110001" />
-                            </div>
-                            <div>
-                                <label class="text-xs">Electricity connection (DISCOM)</label>
-                                <input name="discom" class="w-full mt-1 px-3 py-2 rounded border"
-                                    placeholder="e.g., BSES Rajdhani" />
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-xs">Approx roof area (sq. m)</label>
-                            <input type="number" name="area" class="w-full mt-1 px-3 py-2 rounded border"
-                                placeholder="40" />
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <input type="checkbox" id="netmeter" name="netmeter" />
-                            <label for="netmeter" class="text-sm">I have / can get net-metering</label>
-                        </div>
-                        <div class="flex gap-2">
-                            <button type="submit"
-                                class="flex-1 bg-amber-400 hover:bg-amber-500 text-white px-4 py-2 rounded">Get
-                                report</button>
-                            <button type="button" id="langBtn" class="flex-1 border px-4 py-2 rounded">Switch
-                                language</button>
-                        </div>
-                    </form>
+        <!-- Form Card -->
+        <div class="glass rounded-3xl p-6 md:p-8 shadow-lg fade-in">
+            <h3 id="formTitle" , class="text-lg font-semibold text-slate-800">Quick Eligibility Check</h3>
 
-                    <div id="resultCard" class="mt-4 hidden bg-emerald-50 border border-emerald-100 p-4 rounded">
-                        <h4 class="font-semibold">Estimated result</h4>
-                        <p id="resultText" class="text-sm text-slate-700 mt-2">—</p>
+            <form id="eligibilityForm" class="mt-5 space-y-4">
+                <div>
+                    <label for="name" , class="text-xs uppercase tracking-wide">Full Name</label>
+                    <input required name="name"
+                        class="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-300 focus:outline-none"
+                        placeholder="John Doe" />
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="pincode" class="text-xs uppercase tracking-wide">PIN Code</label>
+                        <input required name="pincode" id="pincode"
+                            class="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-300 focus:outline-none"
+                            placeholder="110001" />
+                    </div>
+                    <div>
+                        <label class="text-xs uppercase tracking-wide">DISCOM</label>
+                        <input for="discom" name="discom"
+                            class="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-300 focus:outline-none"
+                            placeholder="BSES Rajdhani" />
                     </div>
                 </div>
-            </div>
-        </section>
+                <div>
+                    <label for="area" class="text-xs uppercase tracking-wide">Roof Area (m²)</label>
+                    <input type="number" name="area"
+                        class="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-300 focus:outline-none"
+                        placeholder="40" />
+                </div>
 
-        <section class="py-20 bg-white scroll-mt-24">
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="netmeter" name="netmeter" />
+                    <label for="netmeter" class="text-sm text-slate-600">I have / can get net-metering</label>
+                </div>
+
+                <div class="flex gap-2 mt-3">
+                    <button id="reportBtn" type="submit"
+                        class="flex-1 bg-amber-400 hover:bg-amber-500 text-white px-4 py-2 rounded-lg shadow-sm transition">
+                        Get Report
+                    </button>
+                    <button id="langBtn" type="button" id="langBtn"
+                        class="flex-1 border border-slate-200 hover:border-amber-400 hover:text-amber-500 px-4 py-2 rounded-lg transition">
+                        Switch Language
+                    </button>
+                </div>
+            </form>
+
+            <div id="resultCard" class="mt-5 hidden bg-emerald-50 border border-emerald-100 p-4 rounded-lg">
+                <h4 class="font-semibold text-emerald-800">Estimated Result</h4>
+                <p id="resultText" class="text-sm text-slate-700 mt-2 whitespace-pre-line">—</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Features -->
+    <section id="features" class="py-20 bg-gradient-to-b from-white to-amber-50">
         <div class="max-w-6xl mx-auto px-6 text-center">
             <h2 class="text-3xl font-bold mb-10">Features</h2>
-            <div class="grid md:grid-cols-3 gap-10 text-left">
-                <div class="bg-gray-50 p-6 rounded-2xl shadow hover:shadow-lg transition">
+            <div class="grid md:grid-cols-3 gap-8 text-left">
+                <div
+                    class="bg-white rounded-2xl shadow-md hover:shadow-xl p-6 transition transform hover:-translate-y-1">
                     <h3 class="text-xl font-semibold text-blue-600 mb-2">Govt. Scheme Aggregator</h3>
-                    <p>Central & state schemes filtered by eligibility and DISCOM
-                        rules.</p>
+                    <p>Central & state schemes automatically filtered by eligibility and local DISCOM policies.</p>
                 </div>
-                <div class="bg-gray-50 p-6 rounded-2xl shadow hover:shadow-lg transition">
+                <div
+                    class="bg-white rounded-2xl shadow-md hover:shadow-xl p-6 transition transform hover:-translate-y-1">
                     <h3 class="text-xl font-semibold text-green-600 mb-2">Rooftop Solar Estimator</h3>
-                    <p> Uses regional irradiance + roof area + orientation to
-                        estimate kW and savings.</p>
+                    <p>Uses irradiance, orientation & roof area to estimate capacity, generation & savings.</p>
                 </div>
-                <div class="bg-gray-50 p-6 rounded-2xl shadow hover:shadow-lg transition">
-                    <h3 class="text-xl font-semibold text-orange-600 mb-2">Multilingual Guidance</h3>
-                    <p>Auto-detects browser language and provides step-by-step
-                        application guidance.</p>
+                <div
+                    class="bg-white rounded-2xl shadow-md hover:shadow-xl p-6 transition transform hover:-translate-y-1">
+                    <h3 class="text-xl font-semibold text-amber-600 mb-2">Multilingual Guidance</h3>
+                    <p>Auto-detects browser language and guides you step-by-step through the subsidy process.</p>
                 </div>
-                
             </div>
         </div>
     </section>
 
-
-        <!-- <section id="schemes" class="mt-12">
-            <h3 class="text-2xl font-bold">Selected Government Schemes</h3>
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="p-4 bg-white rounded-lg shadow-sm">
-                    <div class="font-semibold">PM Surya Ghar Muft Bijli Yojana (Residential)</div>
-                    <ul class="mt-2 text-sm text-slate-600 list-disc pl-5">
-                        <li>Up to ₹78,000 subsidy for a 3 kW system; monthly free electricity up to 300 units.</li>
-                        <li>Eligibility: Residential consumers with a valid DISCOM connection; installation via
-                            empaneled vendors; grid-connected net-metering.</li>
-                    </ul>
+    <!-- Stats -->
+    <section id="stats" class="py-20 bg-white text-center">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-3xl font-bold mb-8">India’s Solar Potential at a Glance</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-amber-50 p-6 rounded-2xl shadow">
+                    <strong class="text-3xl text-amber-600">5000+</strong>
+                    <p class="mt-2 text-slate-600">Trillion kWh/year potential energy</p>
                 </div>
-
-                <div class="p-4 bg-white rounded-lg shadow-sm">
-                    <div class="font-semibold">PM-KUSUM</div>
-                    <ul class="mt-2 text-sm text-slate-600 list-disc pl-5">
-                        <li>Focus: farmers — subsidies for solar pumps and decentralised plants.</li>
-                        <li>Eligibility: farmers or farmer groups with cultivable/barren land.</li>
-                    </ul>
+                <div class="bg-emerald-50 p-6 rounded-2xl shadow">
+                    <strong class="text-3xl text-green-600">&lt;5%</strong>
+                    <p class="mt-2 text-slate-600">Rooftop solar currently utilized</p>
                 </div>
-
-                <div class="p-4 bg-white rounded-lg shadow-sm">
-                    <div class="font-semibold">MNRE Grid-connected Rooftop Programme</div>
-                    <ul class="mt-2 text-sm text-slate-600 list-disc pl-5">
-                        <li>Central financial assistance: 40% for ≤3 kW; 20% for 3–10 kW (subject to rules).</li>
-                        <li>Only MNRE-approved models and empanelled vendors qualify.</li>
-                    </ul>
-                </div>
-
-                <div class="p-4 bg-white rounded-lg shadow-sm">
-                    <div class="font-semibold">State-level Subsidies</div>
-                    <p class="text-sm text-slate-600 mt-2">Many states provide top-up subsidies and varied net-metering
-                        rules — integrate state APIs/portals where available.</p>
+                <div class="bg-cyan-50 p-6 rounded-2xl shadow">
+                    <strong class="text-3xl text-cyan-600">₹78k+</strong>
+                    <p class="mt-2 text-slate-600">Subsidy available for 3 kW system</p>
                 </div>
             </div>
-        </section> -->
+        </div>
+    </section>
 
-
-        <section class="py-16 section-bg">
-            <div class="max-w-5xl mx-auto text-center">
-                <h2 class="text-3xl font-bold mb-8">Key Statistics Regarding Solar Energy</h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-8 text-lg">
-                    <div class="bg-white shadow rounded-xl p-6">
-                        <strong class="text-2xl text-orange-600">5000+</strong><br />Trillion kWh/year energy potential
-                    </div>
-                    <div class="bg-white shadow rounded-xl p-6">
-                        <strong class="text-2xl text-green-600">&lt;5%</strong><br />Rooftop potential currently
-                        utilized
-                    </div>
-                    <div class="bg-white shadow rounded-xl p-6">
-                        <strong class="text-2xl text-blue-600">smth</strong><br /> Subsidies Available for Rooftop Solar
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <section id="map" class="mt-12">
-            <h3 class="text-2xl font-bold">Solar hotspot map</h3>
-            <div class="mt-4 bg-white rounded-lg p-4 shadow-sm">
-                <div
-                    class="h-64 bg-gradient-to-br from-yellow-50 to-amber-50 rounded flex items-center justify-center text-slate-400">
-                    [Interactive map placeholder — integrate Mapbox/Leaflet + irradiance tile layer here]</div>
-                <p class="text-sm text-slate-500 mt-3">Show regional irradiance, DISCOM drive locations, and areas of
-                    high rooftop potential.</p>
-            </div>
-        </section>
-
-        <section id="estimate" class="mt-12">
-            <h3 class="text-2xl font-bold">How the estimate works</h3>
-            <div class="mt-4 bg-white rounded-lg p-4 shadow-sm">
-                <ol class="list-decimal pl-5 text-sm text-slate-600">
-                    <li>Take roof area + orientation + PIN code.</li>
-                    <li>Lookup regional average annual irradiance for that PIN (preloaded regional dataset).</li>
-                    <li>Estimate kW installable (usable area × packing factor) and expected annual generation.</li>
-                    <li>Match with central + state subsidies & net-metering rules to produce an eligibility & savings
-                        estimate.</li>
-                </ol>
-            </div>
-        </section>
-
-        <footer class="mt-12 py-8 text-sm text-slate-500">
-            <div class="max-w-6xl mx-auto px-6">
-                <div class="flex flex-col md:flex-row md:justify-between gap-4">
-                    <div>© Solaris — demo landing page</div>
-                    <div>Change the App link by replacing <code>downlad link</code> in the HTML.</div>
-                </div>
-            </div>
-        </footer>
-    </main>
+    <footer class="bg-slate-900 text-slate-300 py-8">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-3">
+            <p>© 2025 Solaris — All rights reserved.</p>
+            <p class="text-slate-400 text-sm">Replace the download link in <code>App_DOWNLOAD_Link</code>.</p>
+        </div>
+    </footer>
 
     <script>
+
         const translations = {
-            en: { download: 'Download App' },
-            hi: { download: 'अनुप्रयोग डाउनलोड करें' },
-            mr: { download: 'अनुप्रयोग डाउनलोड करा' },
+            en: {
+                download: "Download App",
+                estimate: "Check Estimate",
+                name: "Full Name",
+                pincode: "PIN Code",
+                discom: "DISCOM",
+                area: "Roof Area (m²)",
+                netmeter: "I have / can get net-metering",
+                report: "Get Report",
+                switch: "Switch Language",
+                title: "Bring solar energy home. Save money. Empower sustainability.",
+                subtitle:
+                    "Solaris helps you understand your rooftop’s solar potential, find regional government schemes, and estimate your annual savings — all in your preferred language.",
+                formTitle: "Quick Eligibility Check",
+                formSubtitle: "Get a free downloadable solar eligibility report.",
+            },
+            hi: {
+                download: "एप डाउनलोड करें",
+                estimate: "अनुमान देखें",
+                name: "पूरा नाम",
+                pincode: "पिन कोड",
+                discom: "डिस्कॉम",
+                area: "छत का क्षेत्रफल (m²)",
+                netmeter: "मेरे पास नेट मीटर है / मैं प्राप्त कर सकता हूँ",
+                report: "रिपोर्ट प्राप्त करें",
+                switch: "भाषा बदलें",
+                title: "सौर ऊर्जा घर लाएं। पैसे बचाएं। सततता बढ़ाएं।",
+                subtitle:
+                    "Solaris आपकी छत की सौर क्षमता, क्षेत्रीय सरकारी योजनाएं और वार्षिक बचत का अनुमान बताता है — आपकी भाषा में।",
+                formTitle: "त्वरित पात्रता जांच",
+                formSubtitle: "निःशुल्क डाउनलोड करने योग्य सौर रिपोर्ट प्राप्त करें।",
+            },
+            mr: {
+                download: "अ‍ॅप डाउनलोड करा",
+                estimate: "अनुमान तपासा",
+                name: "पूर्ण नाव",
+                pincode: "पिन कोड",
+                discom: "डिस्कॉम",
+                area: "छत क्षेत्रफळ (m²)",
+                netmeter: "माझ्याकडे नेट मीटर आहे / मी मिळवू शकतो",
+                report: "अहवाल मिळवा",
+                switch: "भाषा बदला",
+                title: "सौर ऊर्जा घरात आणा. पैसे वाचवा. टिकाऊपणा वाढवा.",
+                subtitle:
+                    "Solaris तुम्हाला तुमच्या छतावरील सौर क्षमतेचे, सरकारी योजना आणि वार्षिक बचतीचे अंदाज दाखवते — तुमच्या भाषेत.",
+                formTitle: "जलद पात्रता तपासणी",
+                formSubtitle: "मोफत डाउनलोड करण्यायोग्य सौर पात्रता अहवाल मिळवा.",
+            },
         }
 
+        // detect user language
         function detectLang() {
-            const tag = navigator.language || navigator.userLanguage || 'en'
-            const code = tag.split('-')[0]
-            return translations[code] ? code : 'en'
+            const tag = navigator.language || navigator.userLanguage || "en"
+            const code = tag.split("-")[0]
+            return translations[code] ? code : "en"
         }
 
-        document.getElementById('eligibilityForm').addEventListener('submit', (e) => {
+        let currentLang = "en"
+
+        // apply translations
+        function applyTranslations(code) {
+            const t = translations[code]
+            document.getElementById("titleText").innerText = t.title
+            document.getElementById("subtitleText").innerText = t.subtitle
+            document.getElementById("download").innerText = t.download
+            document.getElementById("estimateBtn").innerText = t.estimate
+            document.querySelector("label[for='netmeter']").innerText = t.netmeter
+            document.querySelector("label[for='netmeter']").innerText = t.netmeter
+
+            document.querySelector("label[for='name']").innerText = t.name
+            document.querySelector("label[for='pincode']").innerText = t.pincode
+            document.querySelector("label[for='discom']").innerText = t.discom
+            document.querySelector("label[for='area']").innerText = t.area
+
+            document.getElementById("formTitle").innerText = t.formTitle
+            document.getElementById("formSubtitle").innerText = t.formSubtitle
+            document.getElementById("reportBtn").innerText = t.report
+            document.getElementById("langBtn").innerText = t.switch
+        }
+
+        // handle form submission
+        document.getElementById("eligibilityForm").addEventListener("submit", (e) => {
             e.preventDefault()
             const form = new FormData(e.target)
-            const area = Number(form.get('area') || 0)
-            const pincode = form.get('pincode') || ''
+            const area = Number(form.get("area") || 0)
+            const pincode = form.get("pincode") || ""
             if (!area || area <= 0 || !pincode.match(/^\d{6}$/)) {
-                alert('Please enter valid roof area and PIN code.')
+                alert("Please enter valid roof area and PIN code.")
                 return
             }
-            const packingFactor = 0.7 
-            const kwPerSqm = 0.17 
+            const packingFactor = 0.7
+            const kwPerSqm = 0.17
             const estKw = Math.max(0, area * packingFactor * kwPerSqm)
-            const annualGen = estKw * 4.5 * 365 // kWh/year (uses 4.5 sun-hours/day as demo)
-            const estSavings = Math.round(annualGen * 6) // assume ₹6/kWh
+            const annualGen = estKw * 4.5 * 365
+            const estSavings = Math.round(annualGen * 6)
 
             const text = `Estimated installable capacity: ${estKw.toFixed(2)} kW
-            Estimated annual generation: ${Math.round(annualGen)} kWh 
-            Approx annual savings: ₹${estSavings}`
-            document.getElementById('resultText').innerText = text
-            document.getElementById('resultCard').classList.remove('hidden')
+Estimated annual generation: ${Math.round(annualGen)} kWh 
+Approx annual savings: ₹${estSavings}`
+            document.getElementById("resultText").innerText = text
+            document.getElementById("resultCard").classList.remove("hidden")
         })
 
-        // language switch demo
-        document.getElementById('langBtn').addEventListener('click', () => {
-            const code = detectLang()
-            const t = translations[code]
-            document.getElementById('download').innerText = t.download
-            alert('Interface language switched to: ' + code)
+        // switch language
+        document.getElementById("langBtn").addEventListener("click", () => {
+            currentLang = currentLang === "en" ? "hi" : currentLang === "hi" ? "mr" : "en"
+            applyTranslations(currentLang)
         })
 
-        // mobile menu (tiny)
-        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-            alert('Mobile menu')
+        // mobile menu toggle
+        document.getElementById("menu-btn").addEventListener("click", () => {
+            document.getElementById("mobile-menu").classList.toggle("hidden")
         })
+
+        // initial setup
+        applyTranslations(detectLang())
+
+
     </script>
 </body>
+
+
 
 </html>
