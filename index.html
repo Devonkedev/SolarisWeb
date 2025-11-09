@@ -90,7 +90,7 @@
                         estimate</a>
                 </div>
 
-                <div class="mt-6 grid grid-cols-2 gap-3 text-sm">
+                <!-- <div class="mt-6 grid grid-cols-2 gap-3 text-sm">
                     <div class="p-3 bg-white rounded-md shadow-sm">
                         <div class="font-semibold">Subsidy finder</div>
                         <div class="text-slate-500">Central + state schemes matched to your address</div>
@@ -99,7 +99,7 @@
                         <div class="font-semibold">Rooftop potential</div>
                         <div class="text-slate-500">Area, orientation & regional irradiance</div>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <div>
@@ -146,33 +146,10 @@
                     <div id="resultCard" class="mt-4 hidden bg-emerald-50 border border-emerald-100 p-4 rounded">
                         <h4 class="font-semibold">Estimated result</h4>
                         <p id="resultText" class="text-sm text-slate-700 mt-2">—</p>
-                        <a id="downloadReport" class="mt-3 inline-block text-sm underline" href="#">Download eligibility
-                            report (PDF)</a>
                     </div>
                 </div>
             </div>
         </section>
-
-        <!-- <section id="features" class="mt-12">
-            <h3 class="text-2xl font-bold">Features</h3>
-            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="p-4 bg-white rounded-lg shadow-sm">
-                    <div class="font-semibold">Govt. Scheme Aggregator</div>
-                    <p class="text-sm text-slate-500 mt-1">Central & state schemes filtered by eligibility and DISCOM
-                        rules.</p>
-                </div>
-                <div class="p-4 bg-white rounded-lg shadow-sm">
-                    <div class="font-semibold">Rooftop Solar Estimator</div>
-                    <p class="text-sm text-slate-500 mt-1">Uses regional irradiance + roof area + orientation to
-                        estimate kW and savings.</p>
-                </div>
-                <div class="p-4 bg-white rounded-lg shadow-sm">
-                    <div class="font-semibold">Multilingual Guidance</div>
-                    <p class="text-sm text-slate-500 mt-1">Auto-detects browser language and provides step-by-step
-                        application guidance.</p>
-                </div>
-            </div>
-        </section> -->
 
         <section class="py-20 bg-white scroll-mt-24">
         <div class="max-w-6xl mx-auto px-6 text-center">
@@ -198,8 +175,8 @@
         </div>
     </section>
 
-        <!-- Government Schemes -->
-        <section id="schemes" class="mt-12">
+
+        <!-- <section id="schemes" class="mt-12">
             <h3 class="text-2xl font-bold">Selected Government Schemes</h3>
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="p-4 bg-white rounded-lg shadow-sm">
@@ -233,9 +210,9 @@
                         rules — integrate state APIs/portals where available.</p>
                 </div>
             </div>
-        </section>
+        </section> -->
 
-        <!-- Stats -->
+
         <section class="py-16 section-bg">
             <div class="max-w-5xl mx-auto text-center">
                 <h2 class="text-3xl font-bold mb-8">Key Statistics Regarding Solar Energy</h2>
@@ -254,7 +231,7 @@
             </div>
         </section>
 
-        <!-- Solar Hotspot map placeholder -->
+
         <section id="map" class="mt-12">
             <h3 class="text-2xl font-bold">Solar hotspot map</h3>
             <div class="mt-4 bg-white rounded-lg p-4 shadow-sm">
@@ -266,7 +243,6 @@
             </div>
         </section>
 
-        <!-- Estimate & Flow -->
         <section id="estimate" class="mt-12">
             <h3 class="text-2xl font-bold">How the estimate works</h3>
             <div class="mt-4 bg-white rounded-lg p-4 shadow-sm">
@@ -280,7 +256,6 @@
             </div>
         </section>
 
-        <!-- Footer -->
         <footer class="mt-12 py-8 text-sm text-slate-500">
             <div class="max-w-6xl mx-auto px-6">
                 <div class="flex flex-col md:flex-row md:justify-between gap-4">
@@ -292,12 +267,10 @@
     </main>
 
     <script>
-        // Minimal demo JS: fake estimate and multilingual stub
         const translations = {
             en: { download: 'Download App' },
-            hi: { download: 'App डाउनलोड करें' },
-            mr: { download: 'App डाउनलोड करा' },
-            bn: { download: 'App ডাউনলোড' }
+            hi: { download: 'अनुप्रयोग डाउनलोड करें' },
+            mr: { download: 'अनुप्रयोग डाउनलोड करा' },
         }
 
         function detectLang() {
@@ -311,18 +284,21 @@
             const form = new FormData(e.target)
             const area = Number(form.get('area') || 0)
             const pincode = form.get('pincode') || ''
-            // super-simplified estimate
-            const packingFactor = 0.7 // fraction usable
-            const kwPerSqm = 0.17 // typical value: ~170 W/m2 peak
+            if (!area || area <= 0 || !pincode.match(/^\d{6}$/)) {
+                alert('Please enter valid roof area and PIN code.')
+                return
+            }
+            const packingFactor = 0.7 
+            const kwPerSqm = 0.17 
             const estKw = Math.max(0, area * packingFactor * kwPerSqm)
             const annualGen = estKw * 4.5 * 365 // kWh/year (uses 4.5 sun-hours/day as demo)
             const estSavings = Math.round(annualGen * 6) // assume ₹6/kWh
 
-            const text = `Estimated installable capacity: ${estKw.toFixed(2)} kW — Estimated annual generation: ${Math.round(annualGen)} kWh — Approx annual savings: ₹${estSavings}`
+            const text = `Estimated installable capacity: ${estKw.toFixed(2)} kW
+            Estimated annual generation: ${Math.round(annualGen)} kWh 
+            Approx annual savings: ₹${estSavings}`
             document.getElementById('resultText').innerText = text
             document.getElementById('resultCard').classList.remove('hidden')
-            // fake downloadable report link
-            document.getElementById('downloadReport').href = '#report-' + pincode
         })
 
         // language switch demo
@@ -335,7 +311,7 @@
 
         // mobile menu (tiny)
         document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-            alert('Mobile menu — demo only')
+            alert('Mobile menu')
         })
     </script>
 </body>
