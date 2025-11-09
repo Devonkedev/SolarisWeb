@@ -39,7 +39,6 @@
 </head>
 
 <body class="bg-gradient-to-b from-amber-50 via-white to-emerald-50 text-slate-800">
-    <!-- Navbar -->
     <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
             <a href="#home" class="flex items-center gap-3">
@@ -78,7 +77,6 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
     <main class="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
         <div class="fade-in">
             <h1 id="titleText" class="text-4xl md:text-5xl font-extrabold text-slate-800 leading-tight">
@@ -101,7 +99,6 @@
             </div>
         </div>
 
-        <!-- Form Card -->
         <div class="glass rounded-3xl p-6 md:p-8 shadow-lg fade-in">
             <h3 id="formTitle" class="text-lg font-semibold text-slate-800">Quick Eligibility Check</h3>
             <p id="formSubtitle" class="text-sm text-slate-500 mt-1">Get a free downloadable solar eligibility report.
@@ -162,7 +159,6 @@
         </div>
     </main>
 
-    <!-- Features -->
     <section id="features" class="py-20 bg-gradient-to-b from-white to-amber-50">
         <div class="max-w-6xl mx-auto px-6 text-center">
             <h2 class="text-3xl font-bold mb-10">Features</h2>
@@ -186,7 +182,6 @@
         </div>
     </section>
 
-    <!-- Stats -->
     <section id="stats" class="py-20 bg-white text-center">
         <div class="max-w-6xl mx-auto px-6">
             <h2 class="text-3xl font-bold mb-8">India’s Solar Potential at a Glance</h2>
@@ -269,22 +264,18 @@
             }
         };
 
-        // Choose language from browser (auto-detect), fallback to en
         function detectLang() {
             const tag = navigator.language || navigator.userLanguage || "en";
             const code = tag.split("-")[0];
             return translations[code] ? code : "en";
         }
 
-        // Keep current language
         let currentLang = detectLang();
 
-        // Apply translations to all identified elements
         function applyTranslations(code) {
             const t = translations[code];
 
-
-            document.getElementById("titleText").innerHTML = t.title
+            document.getElementById("titleText").innerHTML = t.title;
             document.getElementById("subtitleText").innerText = t.subtitle;
 
             document.getElementById("download").innerText = t.download;
@@ -307,13 +298,13 @@
             document.getElementById("resultTitle").innerText = t.resultTitle;
         }
 
-        // Cycle language: en -> hi -> mr -> en ...
-        function cycleLang() {
-            currentLang = currentLang === "en" ? "hi" : (currentLang === "hi" ? "mr" : "en");
-            applyTranslations(currentLang);
-        }
+        applyTranslations(currentLang);
+        document.getElementById("langBtn").style.display = "none";
 
-        // Form submit handler (localized validation messages and localized result prefixes)
+        const langBtn = document.getElementById("langBtn");
+        langBtn.disabled = true;
+        langBtn.classList.add("opacity-50", "cursor-not-allowed");
+
         document.getElementById("eligibilityForm").addEventListener("submit", (e) => {
             e.preventDefault();
             const form = new FormData(e.target);
@@ -332,7 +323,6 @@
             const annualGen = estKw * 4.5 * 365;
             const estSavings = Math.round(annualGen * 6);
 
-            // Localized numeric output (numbers remain as-is; labels use translation)
             const lines = [
                 `${t.resultTitle}:`,
                 `• Installable Capacity: ${estKw.toFixed(2)} kW`,
@@ -340,30 +330,18 @@
                 `• Approx. Annual Savings: ₹${estSavings}`
             ];
 
-            // join with newline and show
             document.getElementById("resultText").innerText = lines.join("\n");
             document.getElementById("resultCard").classList.remove("hidden");
         });
 
-        // Switch language button (cycles languages)
-        document.getElementById("langBtn").addEventListener("click", () => {
-            cycleLang();
-            // update aria-pressed for accessibility
-            const btn = document.getElementById("langBtn");
-            btn.setAttribute("aria-pressed", String(btn.getAttribute("aria-pressed") !== "true"));
-        });
-
-        // Mobile menu toggle
         document.getElementById("menu-btn").addEventListener("click", () => {
             const menu = document.getElementById("mobile-menu");
             const expanded = menu.classList.contains("hidden") ? "true" : "false";
             menu.classList.toggle("hidden");
             document.getElementById("menu-btn").setAttribute("aria-expanded", expanded);
         });
-
-        // Initial apply
-        applyTranslations(currentLang);
     </script>
+
 </body>
 
 </html>
