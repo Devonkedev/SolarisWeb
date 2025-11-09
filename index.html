@@ -7,6 +7,9 @@
     <title>Solaris — Smart Rooftop Solar Estimator</title>
     <link rel="icon" type="image/png" href="images/favicon.png" />
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/suncalc"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -53,7 +56,7 @@
                 <a href="#features" class="hover:text-amber-600 transition">Features</a>
                 <a href="#schemes" class="hover:text-amber-600 transition">Govt. Schemes</a>
                 <a href="#stats" class="hover:text-amber-600 transition">Stats</a>
-                <a href="#estimate" class="hover:text-amber-600 transition">Estimate</a>
+                <a href="#solar-map" class="hover:text-amber-600 transition">Map</a>
                 <a id="download" href="#download"
                     class="bg-amber-400 hover:bg-amber-500 text-white px-4 py-2 rounded-md shadow transition">Download
                     App</a>
@@ -71,7 +74,7 @@
             <a href="#features" class="hover:text-amber-600">Features</a>
             <a href="#schemes" class="hover:text-amber-600">Govt. Schemes</a>
             <a href="#stats" class="hover:text-amber-600">Stats</a>
-            <a href="#estimate" class="hover:text-amber-600">Estimate</a>
+            <a href="#solar-map" class="hover:text-amber-600">Map</a>
             <a id="download-mobile" href="#download"
                 class="bg-amber-400 hover:bg-amber-500 text-white px-3 py-2 rounded-md text-center">Download App</a>
         </div>
@@ -93,9 +96,9 @@
                 <a id="downloadBtn" href="#download"
                     class="bg-rose-500 hover:bg-rose-600 text-white font-medium px-5 py-3 rounded-lg shadow-md transition">Download
                     App</a>
-                <a id="estimateBtn" href="#estimate"
+                <a id="estimateBtn" href="#solar-map"
                     class="border border-slate-300 hover:border-amber-400 hover:text-amber-600 px-5 py-3 rounded-lg transition">Check
-                    Estimate</a>
+                    Solar Map</a>
             </div>
         </div>
 
@@ -153,7 +156,7 @@
             </form>
 
             <div id="resultCard" class="mt-5 hidden bg-emerald-50 border border-emerald-100 p-4 rounded-lg">
-                <h4 id="resultTitle" class="font-semibold text-emerald-800">Estimated Result</h4>
+                <h4 id="resultTitle" class="font-semibold text-emerald-800">Estimated Result: </h4>
                 <p id="resultText" class="text-sm text-slate-700 mt-2 whitespace-pre-line">—</p>
             </div>
         </div>
@@ -201,6 +204,29 @@
             </div>
         </div>
     </section>
+    <section id="solar-map" class="py-20 bg-gradient-to-b from-amber-50 to-white">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-6 text-slate-800">Solar Tracking & Shadow Map</h2>
+            <p class="text-slate-600 mb-8">
+                Visualize sunlight and shadow direction for your area, powered by open solar data.
+            </p>
+
+            <div class="glass p-4 rounded-2xl shadow-lg">
+                <input id="locationInput" type="text" placeholder="Enter your city or coordinates..."
+                    class="w-full md:w-2/3 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:outline-none mb-4" />
+
+                <button id="showMapBtn"
+                    class="bg-amber-400 hover:bg-amber-500 text-white px-6 py-2 rounded-lg font-medium shadow transition">
+                    Show Solar Map
+                </button>
+
+                <div id="map" class="w-full h-[500px] mt-6 rounded-2xl overflow-hidden border border-slate-200"></div>
+
+                <p id="solarData" class="mt-4 text-slate-700 text-sm"></p>
+            </div>
+        </div>
+    </section>
+
 
     <footer class="bg-slate-900 text-slate-300 py-8">
         <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-3">
@@ -210,10 +236,103 @@
     </footer>
 
     <script>
+        let map;
+
+        document.getElementById("showMapBtn").addEventListener("click", async () => {
+            const input = document.getElementById("locationInput").value.trim();
+            if (!input) return alert("Please enter a city or coordinates.");
+
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}`);
+            const geoData = await geoRes.json();
+            if (!geoData.length) return alert("Location not found.");
+
+            const lat = parseFloat(geoData[0].lat);
+            const lon = parseFloat(geoData[0].lon);
+
+            if (!map) {
+                map = L.map("map").setView([lat, lon], 13);
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+            } else {
+                map.setView([lat, lon], 13);
+            }
+
+            const date = new Date().toISOString().split("T")[0];
+            const url = `https://gml.noaa.gov/grad/solcalc/azel.html?lat=${lat}&lon=${lon}&date=${date}`;
+            const solarRes = await fetch(url);
+            const solarHTML = await solarRes.text();
+
+            const match = solarHTML.match(/<pre>([\s\S]*?)<\/pre>/);
+            let solarText = "Sun data unavailable.";
+            if (match) {
+                const rows = match[1].trim().split("\n");
+                const noonRow = rows[Math.floor(rows.length / 2)];
+                const parts = noonRow.trim().split(/\s+/);
+                const elevation = parseFloat(parts[2]);
+                const azimuth = parseFloat(parts[3]);
+                solarText = `Sun elevation: ${elevation.toFixed(1)}°, Azimuth: ${azimuth.toFixed(1)}°`;
+
+                const shadowLen = (1 / Math.tan((elevation * Math.PI) / 180)) * 10;
+                const azRad = (azimuth * Math.PI) / 180;
+                const lat2 = lat + (shadowLen / 111111) * Math.cos(azRad);
+                const lon2 = lon + (shadowLen / (111111 * Math.cos(lat * Math.PI / 180))) * Math.sin(azRad);
+
+                L.marker([lat, lon]).addTo(map).bindPopup(`<b>${solarText}</b>`).openPopup();
+                L.polyline([[lat, lon], [lat2, lon2]], { color: "orange", weight: 3 }).addTo(map);
+
+                drawSunPath(lat, lon);
+            }
+
+            document.getElementById("solarData").innerText = solarText;
+        });
+    </script>
+
+    <script src="https://unpkg.com/suncalc"></script>
+    <script>
+async function getSolarData(lat, lon) {
+  try {
+    const now = new Date();
+    const pos = SunCalc.getPosition(now, lat, lon);
+
+    const elevation = (pos.altitude * 180) / Math.PI;
+    const azimuth = (pos.azimuth * 180) / Math.PI;
+
+    const times = SunCalc.getTimes(now, lat, lon);
+    const sunrise = times.sunrise.toLocaleTimeString();
+    const sunset = times.sunset.toLocaleTimeString();
+
+    const solarText = `
+      <b>Solar Elevation:</b> ${elevation.toFixed(2)}°<br>
+      <b>Azimuth:</b> ${azimuth.toFixed(2)}°<br>
+      <b>Sunrise:</b> ${sunrise}<br>
+      <b>Sunset:</b> ${sunset}
+    `;
+
+    document.getElementById("solarInfo").innerHTML = solarText;
+
+    L.marker([lat, lon]).addTo(map).bindPopup(solarText).openPopup();
+
+    const len = 0.02; 
+    const azimuthRad = ((azimuth + 180) * Math.PI) / 180;
+    const lat2 = lat + len * Math.cos(azimuthRad);
+    const lon2 = lon + len * Math.sin(azimuthRad);
+    L.polyline([[lat, lon], [lat2, lon2]], { color: "orange", weight: 3 }).addTo(map);
+
+    drawSunPath(lat, lon);
+  } catch (err) {
+    document.getElementById("solarInfo").innerText = "Sun data unavailable.";
+    console.error("Solar data error:", err);
+  }
+}
+
+    </script>
+
+    <script>
         const translations = {
             en: {
                 download: "Download App",
-                estimate: "Check Estimate",
+                estimate: "Check Solar Map",
                 name: "Full Name",
                 pincode: "PIN Code",
                 discom: "DISCOM",
@@ -341,6 +460,7 @@
             document.getElementById("menu-btn").setAttribute("aria-expanded", expanded);
         });
     </script>
+    
 
 </body>
 
