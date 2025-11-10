@@ -231,10 +231,9 @@
     <footer class="bg-slate-900 text-slate-300 py-8">
         <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-3">
             <p>© 2025 Solaris — All rights reserved.</p>
-            <p class="text-slate-400 text-sm">Replace the download link in <code>App_DOWNLOAD_Link</code>.</p>
+            <p class="text-slate-400 text-sm"><code>App_DOWNLOAD_Link</code>.</p>
         </div>
     </footer>
-
     <script>
         let map;
 
@@ -242,7 +241,9 @@
             const input = document.getElementById("locationInput").value.trim();
             if (!input) return alert("Please enter a city or coordinates.");
 
-            const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}`);
+            const geoRes = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}`
+            );
             const geoData = await geoRes.json();
             if (!geoData.length) return alert("Location not found.");
 
@@ -250,83 +251,79 @@
             const lon = parseFloat(geoData[0].lon);
 
             if (!map) {
-                map = L.map("map").setView([lat, lon], 13);
+                map = L.map("map").setView([lat, lon], 14);
                 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-                    attribution: '&copy; OpenStreetMap contributors'
+                    attribution: '&copy; OpenStreetMap contributors',
                 }).addTo(map);
             } else {
-                map.setView([lat, lon], 13);
+                map.setView([lat, lon], 14);
+                map.eachLayer((layer) => {
+                    if (layer instanceof L.Marker || layer instanceof L.Polyline) map.removeLayer(layer);
+                });
             }
 
-            const date = new Date().toISOString().split("T")[0];
-            const url = `https://gml.noaa.gov/grad/solcalc/azel.html?lat=${lat}&lon=${lon}&date=${date}`;
-            const solarRes = await fetch(url);
-            const solarHTML = await solarRes.text();
+            const now = new Date();
+            const pos = SunCalc.getPosition(now, lat, lon);
+            const times = SunCalc.getTimes(now, lat, lon);
 
-            const match = solarHTML.match(/<pre>([\s\S]*?)<\/pre>/);
-            let solarText = "Sun data unavailable.";
-            if (match) {
-                const rows = match[1].trim().split("\n");
-                const noonRow = rows[Math.floor(rows.length / 2)];
-                const parts = noonRow.trim().split(/\s+/);
-                const elevation = parseFloat(parts[2]);
-                const azimuth = parseFloat(parts[3]);
-                solarText = `Sun elevation: ${elevation.toFixed(1)}°, Azimuth: ${azimuth.toFixed(1)}°`;
+            const elevation = (pos.altitude * 180) / Math.PI;
+            const azimuth = ((pos.azimuth * 180) / Math.PI + 180) % 360;
 
-                const shadowLen = (1 / Math.tan((elevation * Math.PI) / 180)) * 10;
-                const azRad = (azimuth * Math.PI) / 180;
-                const lat2 = lat + (shadowLen / 111111) * Math.cos(azRad);
-                const lon2 = lon + (shadowLen / (111111 * Math.cos(lat * Math.PI / 180))) * Math.sin(azRad);
+            const sunrise = times.sunrise.toLocaleTimeString();
+            const sunset = times.sunset.toLocaleTimeString();
 
-                L.marker([lat, lon]).addTo(map).bindPopup(`<b>${solarText}</b>`).openPopup();
-                L.polyline([[lat, lon], [lat2, lon2]], { color: "orange", weight: 3 }).addTo(map);
+            const solarText = `
+    <b>Solar Elevation:</b> ${elevation.toFixed(1)}°<br>
+    <b>Azimuth:</b> ${azimuth.toFixed(1)}°<br>
+    <b>Sunrise:</b> ${sunrise}<br>
+    <b>Sunset:</b> ${sunset}
+  `;
 
-                drawSunPath(lat, lon);
-            }
+            document.getElementById("solarData").innerHTML = solarText;
 
-            document.getElementById("solarData").innerText = solarText;
+            const shadowLen = 10 / Math.tan((elevation * Math.PI) / 180);
+            const azRad = (azimuth * Math.PI) / 180;
+            const lat2 = lat + (shadowLen / 111111) * Math.cos(azRad);
+            const lon2 =
+                lon + (shadowLen / (111111 * Math.cos((lat * Math.PI) / 180))) * Math.sin(azRad);
+
+            L.marker([lat, lon]).addTo(map).bindPopup(solarText).openPopup();
+            L.polyline(
+                [
+                    [lat, lon],
+                    [lat2, lon2],
+                ],
+                { color: "orange", weight: 3 }
+            ).addTo(map);
+
+            drawSunPath(lat, lon);
         });
+
+        function drawSunPath(lat, lon) {
+            const pathPoints = [];
+            for (let h = 6; h <= 18; h++) {
+                const date = new Date();
+                date.setHours(h, 0, 0);
+                const pos = SunCalc.getPosition(date, lat, lon);
+                const az = ((pos.azimuth * 180) / Math.PI + 180) % 360;
+                const alt = (pos.altitude * 180) / Math.PI;
+
+                if (alt > 0) {
+                    const len = 10 / Math.tan((alt * Math.PI) / 180);
+                    const azRad = (az * Math.PI) / 180;
+                    const lat2 = lat + (len / 111111) * Math.cos(azRad);
+                    const lon2 =
+                        lon + (len / (111111 * Math.cos((lat * Math.PI) / 180))) * Math.sin(azRad);
+                    pathPoints.push([lat2, lon2]);
+                }
+            }
+
+            if (pathPoints.length > 1) {
+                L.polyline(pathPoints, { color: "gold", weight: 2, dashArray: "5,5" }).addTo(map);
+            }
+        }
     </script>
 
-    <script src="https://unpkg.com/suncalc"></script>
-    <script>
-async function getSolarData(lat, lon) {
-  try {
-    const now = new Date();
-    const pos = SunCalc.getPosition(now, lat, lon);
-
-    const elevation = (pos.altitude * 180) / Math.PI;
-    const azimuth = (pos.azimuth * 180) / Math.PI;
-
-    const times = SunCalc.getTimes(now, lat, lon);
-    const sunrise = times.sunrise.toLocaleTimeString();
-    const sunset = times.sunset.toLocaleTimeString();
-
-    const solarText = `
-      <b>Solar Elevation:</b> ${elevation.toFixed(2)}°<br>
-      <b>Azimuth:</b> ${azimuth.toFixed(2)}°<br>
-      <b>Sunrise:</b> ${sunrise}<br>
-      <b>Sunset:</b> ${sunset}
-    `;
-
-    document.getElementById("solarInfo").innerHTML = solarText;
-
-    L.marker([lat, lon]).addTo(map).bindPopup(solarText).openPopup();
-
-    const len = 0.02; 
-    const azimuthRad = ((azimuth + 180) * Math.PI) / 180;
-    const lat2 = lat + len * Math.cos(azimuthRad);
-    const lon2 = lon + len * Math.sin(azimuthRad);
-    L.polyline([[lat, lon], [lat2, lon2]], { color: "orange", weight: 3 }).addTo(map);
-
-    drawSunPath(lat, lon);
-  } catch (err) {
-    document.getElementById("solarInfo").innerText = "Sun data unavailable.";
-    console.error("Solar data error:", err);
-  }
-}
-
-    </script>
 
     <script>
         const translations = {
@@ -460,7 +457,7 @@ async function getSolarData(lat, lon) {
             document.getElementById("menu-btn").setAttribute("aria-expanded", expanded);
         });
     </script>
-    
+
 
 </body>
 
