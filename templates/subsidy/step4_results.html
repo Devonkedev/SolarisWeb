@@ -10,21 +10,26 @@
 
         {% include "subsidy/_progress.html" %}
 
-        <div class="grid md:grid-cols-3 gap-4">
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-2">
                 <h2 class="text-sm uppercase tracking-wide text-slate-500">Recommended system size</h2>
                 <p class="text-3xl font-semibold text-slate-900">{{ "{:.2f}".format(recommended_kw) }} kW</p>
                 <p class="text-xs text-slate-400">Sized using rooftop area and annual consumption.</p>
             </div>
             <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-2">
-                <h2 class="text-sm uppercase tracking-wide text-slate-500">Net investment</h2>
-                <p class="text-3xl font-semibold text-slate-900">₹{{ "{:,.0f}".format(result.net_cost) }}</p>
-                <p class="text-xs text-slate-400">Gross ₹{{ "{:,.0f}".format(result.gross_cost) }} with central ₹{{ "{:,.0f}".format(result.central) }} and state ₹{{ "{:,.0f}".format(result.state_subsidy) }} support.</p>
+                <h2 class="text-sm uppercase tracking-wide text-slate-500">Initial cost</h2>
+                <p class="text-3xl font-semibold text-slate-900">₹{{ "{:,.0f}".format(result.gross_cost) }}</p>
+                <p class="text-xs text-slate-400">Turnkey cost before subsidies (₹{{ "{:,.0f}".format(result.gross_cost / (recommended_kw or 1)) }}/kW).</p>
             </div>
             <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-2">
-                <h2 class="text-sm uppercase tracking-wide text-slate-500">Estimated annual savings</h2>
-                <p class="text-3xl font-semibold text-emerald-600">₹{{ "{:,.0f}".format(estimated_annual_savings) }}</p>
-                <p class="text-xs text-slate-400">Based on {{ "{:,.0f}".format(recommended_kw * 1100) }} kWh generation.</p>
+                <h2 class="text-sm uppercase tracking-wide text-slate-500">Subsidy support</h2>
+                <p class="text-3xl font-semibold text-emerald-600">₹{{ "{:,.0f}".format(result.central + result.state_subsidy) }}</p>
+                <p class="text-xs text-slate-400">Central ₹{{ "{:,.0f}".format(result.central) }} + State ₹{{ "{:,.0f}".format(result.state_subsidy) }}.</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-2">
+                <h2 class="text-sm uppercase tracking-wide text-slate-500">Net cost after subsidy</h2>
+                <p class="text-3xl font-semibold text-slate-900">₹{{ "{:,.0f}".format(result.net_cost) }}</p>
+                <p class="text-xs text-emerald-600">Estimated annual savings ₹{{ "{:,.0f}".format(estimated_annual_savings) }} ({{ "{:,.0f}".format(recommended_kw * 1100) }} kWh/year).</p>
             </div>
         </div>
 
@@ -135,8 +140,8 @@
         </div>
 
         <div class="flex flex-wrap gap-3">
-            <a href="{{ url_for('subsidy.site') }}" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold px-5 py-3 rounded-lg shadow transition">
-                Update site details
+            <a href="{{ url_for('dashboard.index') }}" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold px-5 py-3 rounded-lg shadow transition">
+                Go to dashboard
             </a>
             <a href="{{ url_for('tracker.index') }}" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-5 py-3 rounded-lg shadow transition">
                 Open energy tracker

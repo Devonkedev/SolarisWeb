@@ -13,10 +13,23 @@
         </div>
         <div class="glass p-6 rounded-2xl shadow">
             <h2 class="text-lg font-semibold text-slate-700">Quick estimate</h2>
-            <p class="text-sm text-slate-500 mt-2">Need an updated subsidy projection?</p>
-            <a href="{{ url_for('subsidy.eligibility') }}" class="inline-flex items-center justify-center w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-4 py-3 rounded-lg mt-4">
-                Run subsidy estimator
-            </a>
+            {% if estimate_summary.system_kw %}
+                <p class="text-3xl font-bold text-slate-900">{{ "{:.2f}".format(estimate_summary.system_kw) }} kW scoped</p>
+                <p class="text-sm text-slate-500">Net investment: ₹{{ "{:,.0f}".format(estimate_summary.net_cost or 0) }}</p>
+                <div class="mt-4 space-y-1 text-sm text-slate-600">
+                    <p>Monthly savings: <span class="font-semibold text-emerald-600">₹{{ "{:,.0f}".format(estimate_stats.monthly_savings) }}</span></p>
+                    <p>Lifetime savings (25 yrs): <span class="font-semibold text-emerald-600">₹{{ "{:,.0f}".format(estimate_stats.lifetime_savings) }}</span></p>
+                    <p>CO₂ offset per year: <span class="font-semibold text-slate-800">{{ "{:.1f}".format(estimate_stats.co2_offset) }} tonnes</span></p>
+                </div>
+                {% if estimate_summary.updated_at %}
+                    <p class="text-xs text-slate-400 mt-3">Last calculated {{ estimate_summary.updated_at.strftime('%d %b %Y') }}. Re-run if your numbers changed.</p>
+                {% endif %}
+            {% else %}
+                <p class="text-sm text-slate-500 mt-2">Need an updated subsidy projection?</p>
+                <a href="{{ url_for('subsidy.eligibility') }}" class="inline-flex items-center justify-center w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-4 py-3 rounded-lg mt-4">
+                    Run subsidy estimator
+                </a>
+            {% endif %}
         </div>
         <div class="glass p-6 rounded-2xl shadow">
             <h2 class="text-lg font-semibold text-slate-700">Projects</h2>

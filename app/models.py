@@ -46,6 +46,10 @@ class User(db.Model, UserMixin):
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
+    last_system_kw = db.Column(db.Float)
+    last_net_cost_inr = db.Column(db.Float)
+    last_estimated_savings_inr = db.Column(db.Float)
+    last_estimate_updated_at = db.Column(db.DateTime)
 
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
