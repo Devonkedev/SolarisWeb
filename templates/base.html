@@ -27,29 +27,30 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-gradient-to-b from-sky-50 via-white to-cyan-50 text-slate-800 min-h-screen flex flex-col">
-    <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+    <header class="sticky top-0 z-50 border-b border-white/60">
+        <div class="bg-white/85 backdrop-blur-xl supports-backdrop-blur:bg-white/80 shadow-[0_12px_45px_-25px_rgba(14,116,144,0.65)]">
+        <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 md:py-4">
             <a href="{{ url_for('main.home') }}" class="flex items-center space-x-2">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Solaris Logo" class="w-28">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Solaris Logo" class="w-24 md:w-28 drop-shadow-md">
             </a>
-            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-700">
-                <a href="{{ url_for('main.home') }}#features" class="hover:text-cyan-600 transition">Features</a>
-                <a href="{{ url_for('main.home') }}#stats" class="hover:text-cyan-600 transition">Stats</a>
-                <a href="{{ url_for('main.home') }}#solar-map" class="hover:text-cyan-600 transition">Map</a>
-                <a href="{{ url_for('main.home') }}#download" class="hover:text-cyan-600 transition">Download</a>
+            <nav class="hidden md:flex items-center gap-2 text-sm font-medium text-slate-600">
+                <a href="{{ url_for('main.home') }}#features" class="nav-link">Features</a>
+                <a href="{{ url_for('main.home') }}#stats" class="nav-link">Stats</a>
+                <a href="{{ url_for('main.home') }}#solar-map" class="nav-link">Map</a>
+                <a href="{{ url_for('main.home') }}#download" class="nav-link">Download</a>
             </nav>
             <div class="hidden md:flex items-center gap-3">
                 {% if current_user.is_authenticated %}
-                <a href="{{ url_for('dashboard.index') }}" class="text-sm font-semibold text-slate-700 hover:text-cyan-600 transition">Dashboard</a>
+                <a href="{{ url_for('dashboard.index') }}" class="nav-link nav-link--ghost">Dashboard</a>
                 <form method="post" action="{{ url_for('auth.logout') }}" class="inline">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-md shadow transition">
+                    <button type="submit" class="header-cta header-cta--outline">
                         Logout
                     </button>
                 </form>
                 {% else %}
-                <a href="{{ url_for('auth.login') }}" class="text-sm font-semibold text-slate-700 hover:text-cyan-600 transition">Login</a>
-                <a href="{{ url_for('auth.register') }}" class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-md shadow transition">
+                <a href="{{ url_for('auth.login') }}" class="nav-link nav-link--ghost">Login</a>
+                <a href="{{ url_for('auth.register') }}" class="header-cta">
                     Create Account
                 </a>
                 {% endif %}
@@ -58,30 +59,31 @@
             <button id="menu-btn"
                     aria-expanded="false"
                     aria-controls="mobile-menu"
-                    class="md:hidden text-slate-700">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                    class="md:hidden text-slate-600 hover:text-slate-800 transition rounded-full border border-slate-200/70 p-2 shadow-sm shadow-slate-200/60 bg-white/70">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
             </button>
         </div>
+        </div>
 
-        <div id="mobile-menu" class="md:hidden hidden flex-col bg-white/95 text-slate-800 shadow px-6 py-4 space-y-3">
-            <a href="{{ url_for('main.home') }}#features" class="hover:text-cyan-600">Features</a>
-            <a href="{{ url_for('main.home') }}#stats" class="hover:text-cyan-600">Stats</a>
-            <a href="{{ url_for('main.home') }}#solar-map" class="hover:text-cyan-600">Map</a>
-            <a href="{{ url_for('main.home') }}#download" class="hover:text-cyan-600">Download</a>
-            <div class="border-t border-slate-200 pt-3 mt-2 space-y-2">
+        <div id="mobile-menu" class="md:hidden hidden flex-col bg-white/90 backdrop-blur px-6 py-5 space-y-4 shadow-lg shadow-cyan-500/10 border-t border-white/60">
+            <a href="{{ url_for('main.home') }}#features" class="nav-link nav-link--mobile">Features</a>
+            <a href="{{ url_for('main.home') }}#stats" class="nav-link nav-link--mobile">Stats</a>
+            <a href="{{ url_for('main.home') }}#solar-map" class="nav-link nav-link--mobile">Map</a>
+            <a href="{{ url_for('main.home') }}#download" class="nav-link nav-link--mobile">Download</a>
+            <div class="border-t border-slate-200/70 pt-4 space-y-3">
                 {% if current_user.is_authenticated %}
-                <a href="{{ url_for('dashboard.index') }}" class="hover:text-cyan-600">Dashboard</a>
+                <a href="{{ url_for('dashboard.index') }}" class="nav-link nav-link--mobile">Dashboard</a>
                 <form method="post" action="{{ url_for('auth.logout') }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-white px-3 py-2 rounded-md w-full text-center">
+                    <button type="submit" class="header-cta header-cta--block header-cta--outline">
                         Logout
                     </button>
                 </form>
                 {% else %}
-                <a href="{{ url_for('auth.login') }}" class="hover:text-cyan-600">Login</a>
-                <a href="{{ url_for('auth.register') }}" class="bg-cyan-500 hover:bg-cyan-600 text-white px-3 py-2 rounded-md text-center">
+                <a href="{{ url_for('auth.login') }}" class="nav-link nav-link--mobile">Login</a>
+                <a href="{{ url_for('auth.register') }}" class="header-cta header-cta--block">
                     Create Account
                 </a>
                 {% endif %}
