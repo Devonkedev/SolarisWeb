@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-6 py-12 space-y-10">
+    <div class="grid md:grid-cols-3 gap-6">
+        <div class="glass p-6 rounded-2xl shadow">
+            <h2 class="text-lg font-semibold text-slate-700">Energy tracker</h2>
+            <p class="text-4xl font-bold text-slate-900">{{ "{:,.1f}".format(total_generation or 0) }}</p>
+            <p class="text-sm text-slate-500">kWh logged as generation</p>
+            <a href="{{ url_for('tracker.index') }}" class="inline-flex items-center justify-center w-full mt-4 text-sm font-semibold text-cyan-600 hover:text-cyan-700">
+                View tracker →
+            </a>
+        </div>
+        <div class="glass p-6 rounded-2xl shadow">
+            <h2 class="text-lg font-semibold text-slate-700">Quick estimate</h2>
+            <p class="text-sm text-slate-500 mt-2">Need an updated subsidy projection?</p>
+            <a href="{{ url_for('subsidy.eligibility') }}" class="inline-flex items-center justify-center w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-4 py-3 rounded-lg mt-4">
+                Run subsidy estimator
+            </a>
+        </div>
+        <div class="glass p-6 rounded-2xl shadow">
+            <h2 class="text-lg font-semibold text-slate-700">Projects</h2>
+            <p class="text-4xl font-bold text-slate-900">{{ recent_projects|length }}</p>
+            <p class="text-sm text-slate-500">Active solar projects tracked</p>
+            <a href="{{ url_for('projects.list_projects') }}" class="inline-flex items-center justify-center w-full mt-4 text-sm font-semibold text-cyan-600 hover:text-cyan-700">
+                View projects →
+            </a>
+        </div>
+    </div>
+
+    {% if show_tracker_cta %}
+    <div class="glass p-6 rounded-2xl shadow flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h2 class="text-xl font-semibold text-slate-800">Solar tracker & shadow map</h2>
+            <p class="text-sm text-slate-500 mt-2">Monitor real-time sun paths, shadow lengths and solar window for your rooftop.</p>
+        </div>
+        <a href="{{ url_for('main.health') }}" class="inline-flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-5 py-3 rounded-lg shadow">
+            Open solar tracker
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="grid lg:grid-cols-2 gap-8">
+        <div class="glass p-6 rounded-2xl shadow space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-slate-800">Recent tracker entries</h3>
+                <a href="{{ url_for('tracker.add_entry') }}" class="text-sm text-cyan-600 hover:text-cyan-700">Add entry</a>
+            </div>
+            {% if recent_energy %}
+                <ul class="space-y-3">
+                    {% for log in recent_energy %}
+                        <li class="border border-slate-200 rounded-xl px-4 py-3">
+                            <div class="flex items-center justify-between">
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-sky-100 text-sky-700">{{ log.entry_type|capitalize }}</span>
+                                <span class="text-xs text-slate-500">{{ log.date.strftime('%d %b %Y') }}</span>
+                            </div>
+                            <p class="text-lg font-semibold text-slate-800">{{ "{:,.2f}".format(log.kwh) }} kWh</p>
+                            {% if log.revenue %}
+                                <p class="text-sm text-emerald-600">₹{{ "{:,.2f}".format(log.revenue) }} recorded</p>
+                            {% endif %}
+                            {% if log.note %}
+                                <p class="text-sm text-slate-500">{{ log.note }}</p>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-sm text-slate-500">No energy entries yet. Log your first generation or consumption record to see trends here.</p>
+            {% endif %}
+        </div>
+        <div class="glass p-6 rounded-2xl shadow space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-slate-800">Recent projects</h3>
+                <a href="{{ url_for('projects.add_project') }}" class="text-sm text-cyan-600 hover:text-cyan-700">Add project</a>
+            </div>
+            {% if recent_projects %}
+                <ul class="space-y-3">
+                    {% for project in recent_projects %}
+                        <li class="border border-slate-200 rounded-xl px-4 py-3">
+                            <div class="flex items-center justify-between">
+                                <p class="font-semibold text-slate-800">{{ project.name }}</p>
+                                <span class="text-xs uppercase tracking-wide px-3 py-1 rounded-full bg-sky-100 text-sky-600">{{ project.system_type|replace('-', ' ')|title }}</span>
+                            </div>
+                            {% if project.detail %}
+                                <p class="text-sm text-slate-500 mt-1">{{ project.detail }}</p>
+                            {% endif %}
+                            <a href="{{ url_for('projects.project_detail', project_id=project.id) }}" class="text-sm text-cyan-600 hover:text-cyan-700 mt-2 inline-block">View details →</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-sm text-slate-500">No projects logged yet. Add your first installation to track vendors, quotes and photos.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+

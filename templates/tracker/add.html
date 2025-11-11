@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="max-w-4xl mx-auto px-6 py-12 space-y-8">
+    <div class="glass rounded-3xl p-8 shadow space-y-6">
+        <h1 class="text-3xl font-bold text-slate-800">Add energy entry</h1>
+        <p class="text-slate-500">Capture daily generation, consumption or exports for your rooftop system.</p>
+
+        <form method="post" novalidate class="space-y-5">
+            {{ form.hidden_tag() }}
+
+            <div>
+                <label for="{{ form.kwh.id }}" class="block text-sm font-semibold text-slate-600 mb-1">{{ form.kwh.label.text }}</label>
+                {{ form.kwh(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
+                {% if form.kwh.errors %}
+                    <p class="text-sm text-rose-500 mt-1">{{ form.kwh.errors[0] }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.revenue.id }}" class="block text-sm font-semibold text-slate-600 mb-1">{{ form.revenue.label.text }}</label>
+                {{ form.revenue(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
+                {% if form.revenue.errors %}
+                    <p class="text-sm text-rose-500 mt-1">{{ form.revenue.errors[0] }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.panel_id.id }}" class="block text-sm font-semibold text-slate-600 mb-1">{{ form.panel_id.label.text }}</label>
+                {{ form.panel_id(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
+            </div>
+
+            <div>
+                <label for="{{ form.entry_type.id }}" class="block text-sm font-semibold text-slate-600 mb-1">{{ form.entry_type.label.text }}</label>
+                {{ form.entry_type(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
+                {% if form.entry_type.errors %}
+                    <p class="text-sm text-rose-500 mt-1">{{ form.entry_type.errors[0] }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.date.id }}" class="block text-sm font-semibold text-slate-600 mb-1">{{ form.date.label.text }}</label>
+                {{ form.date(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none", type='date') }}
+                {% if form.date.errors %}
+                    <p class="text-sm text-rose-500 mt-1">{{ form.date.errors[0] }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.note.id }}" class="block text-sm font-semibold text-slate-600 mb-1">{{ form.note.label.text }}</label>
+                {{ form.note(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none", rows=4) }}
+            </div>
+
+            <div class="flex flex-wrap gap-3">
+                <button type="submit" class="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-5 py-3 rounded-lg shadow">
+                    {{ form.submit.label.text }}
+                </button>
+                <a href="{{ url_for('tracker.index') }}" class="px-5 py-3 rounded-lg border border-slate-300 text-sm font-semibold text-slate-600 hover:border-slate-400">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

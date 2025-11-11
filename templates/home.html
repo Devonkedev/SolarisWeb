@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section id="home" class="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
+    <div class="fade-in">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 leading-tight">
+            Bring solar energy home.<br><span class="text-cyan-500">Save money. Empower sustainability.</span>
+        </h1>
+        <p class="mt-5 text-slate-600 text-lg leading-relaxed">
+            Solaris helps you understand your rooftop’s solar potential, manage installations, schedule smart reminders, and keep your household prepared — now on the web.
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-4">
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('dashboard.index') }}" class="bg-sky-600 hover:bg-sky-700 text-white font-medium px-5 py-3 rounded-lg shadow-md transition">Go to dashboard</a>
+            <a href="{{ url_for('subsidy.eligibility') }}" class="border border-slate-300 hover:border-cyan-400 hover:text-cyan-600 px-5 py-3 rounded-lg transition">Check subsidy</a>
+            {% else %}
+            <a href="{{ url_for('auth.register') }}" class="bg-sky-600 hover:bg-sky-700 text-white font-medium px-5 py-3 rounded-lg shadow-md transition">Create account</a>
+            <a href="{{ url_for('auth.login') }}" class="border border-slate-300 hover:border-cyan-400 hover:text-cyan-600 px-5 py-3 rounded-lg transition">Sign in</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="glass rounded-3xl p-6 md:p-8 shadow-lg fade-in">
+        <h3 class="text-lg font-semibold text-slate-800">Quick Rooftop Check</h3>
+        <p class="text-sm text-slate-500 mt-1">Estimate installable capacity and savings in seconds.</p>
+
+        <form id="eligibilityForm" class="mt-5 space-y-4">
+            <div>
+                <label for="name" class="text-xs uppercase tracking-wide">Full Name</label>
+                <input id="name" name="name" required class="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-cyan-300 focus:outline-none" placeholder="John Doe">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="pincode" class="text-xs uppercase tracking-wide">PIN Code</label>
+                    <input id="pincode" name="pincode" required inputmode="numeric" pattern="\d{6}" class="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-cyan-300 focus:outline-none" placeholder="110001">
+                </div>
+                <div>
+                    <label for="discom" class="text-xs uppercase tracking-wide">DISCOM</label>
+                    <input id="discom" name="discom" class="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-cyan-300 focus:outline-none" placeholder="BSES Rajdhani">
+                </div>
+            </div>
+
+            <div>
+                <label for="area" class="text-xs uppercase tracking-wide">Roof Area (m²)</label>
+                <input id="area" name="area" type="number" min="0" step="0.1" class="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-cyan-300 focus:outline-none" placeholder="40">
+            </div>
+
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="netmeter" name="netmeter">
+                <label for="netmeter" class="text-sm text-slate-600">I have / can get net-metering</label>
+            </div>
+
+            <div class="flex gap-2 mt-3">
+                <button id="reportBtn" type="submit" class="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg shadow-sm transition">
+                    Get Report
+                </button>
+            </div>
+        </form>
+
+        <div id="resultCard" class="mt-5 hidden bg-sky-50 border border-sky-100 p-4 rounded-lg">
+            <h4 class="font-semibold text-sky-800">Estimated Result</h4>
+            <p id="resultText" class="text-sm text-slate-700 mt-2 whitespace-pre-line">—</p>
+            <p class="text-xs text-slate-500 mt-2">Sign in for detailed subsidy matching and reminders.</p>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="py-20 bg-gradient-to-b from-white to-sky-50">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+        <h2 class="text-3xl font-bold mb-10">Features</h2>
+        <div class="grid md:grid-cols-3 gap-8 text-left">
+            <div class="bg-white rounded-2xl shadow-md hover:shadow-xl p-6 transition transform hover:-translate-y-1">
+                <h3 class="text-xl font-semibold text-blue-600 mb-2">Govt. Scheme Aggregator</h3>
+                <p>Central & state schemes automatically filtered by eligibility and local DISCOM policies.</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-md hover:shadow-xl p-6 transition transform hover:-translate-y-1">
+                <h3 class="text-xl font-semibold text-green-600 mb-2">Rooftop Solar Estimator</h3>
+                <p>Uses irradiance, orientation & roof area to estimate capacity, generation & savings.</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-md hover:shadow-xl p-6 transition transform hover:-translate-y-1">
+                <h3 class="text-xl font-semibold text-amber-600 mb-2">Smart Reminders & Logs</h3>
+                <p>Stay on top of inspections, net-metering, maintenance, health logs and subsidy deadlines.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="stats" class="py-20 bg-white text-center">
+    <div class="max-w-6xl mx-auto px-6">
+        <h2 class="text-3xl font-bold mb-8">India’s Solar Potential at a Glance</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-amber-50 p-6 rounded-2xl shadow">
+                <strong class="text-3xl text-amber-600">5000+</strong>
+                <p class="mt-2 text-slate-600">Trillion kWh/year potential energy</p>
+            </div>
+            <div class="bg-emerald-50 p-6 rounded-2xl shadow">
+                <strong class="text-3xl text-green-600">&lt;5%</strong>
+                <p class="mt-2 text-slate-600">Rooftop solar currently utilized</p>
+            </div>
+            <div class="bg-cyan-50 p-6 rounded-2xl shadow">
+                <strong class="text-3xl text-cyan-600">₹78k+</strong>
+                <p class="mt-2 text-slate-600">Subsidy available for 3 kW system</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="solar-map" class="py-20 bg-gradient-to-b from-sky-50 to-white">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+        <h2 class="text-3xl font-bold mb-6 text-slate-800">Solar Tracking & Shadow Map</h2>
+        <p class="text-slate-600 mb-8">
+            Visualize sunlight angles and projected shadows for your rooftop, powered by open solar data.
+        </p>
+
+        <div class="glass p-4 rounded-2xl shadow-lg">
+            <input id="locationInput" type="text" placeholder="Enter your city or coordinates..."
+                   class="w-full md:w-2/3 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:outline-none mb-4">
+            <button id="showMapBtn" class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg font-medium shadow transition">
+                Show Solar Map
+            </button>
+            <div id="map" class="w-full h-[500px] mt-6 rounded-2xl overflow-hidden border border-slate-200"></div>
+            <p id="solarData" class="mt-4 text-slate-700 text-sm"></p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+{% endblock %}
+

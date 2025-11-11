@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto px-6 py-12 space-y-10">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+            <p class="text-sm text-slate-500">Member since {{ current_user.created_at.strftime('%d %b %Y') }}</p>
+            <h1 class="text-3xl font-bold text-slate-800">Profile</h1>
+            <p class="text-slate-500 mt-2">Review personal details, subsidy contacts and health logs, just like the Expo profile module.</p>
+        </div>
+        <a href="{{ url_for('profile.edit_profile') }}" class="inline-flex items-center gap-2 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-4 py-3 rounded-lg shadow transition">
+            Edit profile
+        </a>
+    </div>
+
+    <div class="glass rounded-2xl p-6 shadow grid gap-6 md:grid-cols-2">
+        <div>
+            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">Name</p>
+            <p class="text-lg text-slate-800">{{ current_user.name or '—' }}</p>
+        </div>
+        <div>
+            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">Email</p>
+            <p class="text-lg text-slate-800">{{ current_user.email }}</p>
+        </div>
+        <div>
+            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">Phone</p>
+            <p class="text-lg text-slate-800">{{ current_user.phone or '—' }}</p>
+        </div>
+        <div>
+            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">Date of birth</p>
+            <p class="text-lg text-slate-800">{{ current_user.dob.strftime('%d %b %Y') if current_user.dob else '—' }}</p>
+        </div>
+    </div>
+
+    <div class="grid gap-10 md:grid-cols-2">
+        <div class="space-y-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-slate-800">Health metrics</h2>
+            </div>
+            <div class="space-y-3">
+                {% if stats %}
+                    {% for stat in stats %}
+                        <div class="glass rounded-xl px-4 py-3 shadow flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-700">{{ stat.label }}</p>
+                                <p class="text-xs text-slate-400">{{ stat.created_at.strftime('%d %b %Y %H:%M') }}</p>
+                            </div>
+                            <span class="text-lg font-semibold text-cyan-600">{{ stat.value }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-sm text-slate-500">No metrics logged yet.</p>
+                {% endif %}
+            </div>
+            <div class="glass rounded-2xl p-5 shadow">
+                <h3 class="text-lg font-semibold text-slate-800 mb-3">Add metric</h3>
+                <form method="post" action="{{ url_for('profile.add_health_stat') }}" class="space-y-3">
+                    {{ stat_form.hidden_tag() }}
+                    <label class="block text-sm font-semibold text-slate-600 mb-1" for="{{ stat_form.label.id }}">{{ stat_form.label.label.text }}</label>
+                    {{ stat_form.label(class_="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
+                    <label class="block text-sm font-semibold text-slate-600 mb-1" for="{{ stat_form.value.id }}">{{ stat_form.value.label.text }}</label>
+                    {{ stat_form.value(class_="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
+                    <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-4 py-2 rounded-lg transition">
+                        {{ stat_form.submit.label.text }}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-slate-800">Health notes</h2>
+            </div>
+            <div class="space-y-3 max-h-80 overflow-y-auto pr-2">
+                {% if logs %}
+                    {% for log in logs %}
+                        <div class="glass rounded-xl px-4 py-3 shadow">
+                            <p class="text-sm text-slate-700">{{ log.note }}</p>
+                            <p class="text-xs text-slate-400 mt-2">{{ log.created_at.strftime('%d %b %Y %H:%M') }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-sm text-slate-500">No logs captured yet.</p>
+                {% endif %}
+            </div>
+            <div class="glass rounded-2xl p-5 shadow">
+                <h3 class="text-lg font-semibold text-slate-800 mb-3">Add log</h3>
+                <form method="post" action="{{ url_for('profile.add_health_log') }}" class="space-y-3">
+                    {{ log_form.hidden_tag() }}
+                    <label class="block text-sm font-semibold text-slate-600 mb-1" for="{{ log_form.note.id }}">{{ log_form.note.label.text }}</label>
+                    {{ log_form.note(class_="w-full px-4 py-3 border border-slate-200 rounded-lg h-28 focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
+                    <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-4 py-2 rounded-lg transition">
+                        {{ log_form.submit.label.text }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

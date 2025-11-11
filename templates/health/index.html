@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-6 py-12 space-y-10">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800">Solar health view</h1>
+            <p class="text-slate-500 mt-2">Interactively explore sunlight angles, shadow projections and roof exposure — mirroring the Expo solar map experience.</p>
+        </div>
+        <a href="{{ url_for('subsidy.eligibility') }}" class="inline-flex items-center gap-2 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-4 py-3 rounded-lg shadow transition">
+            Run subsidy estimator
+        </a>
+    </div>
+
+    <div class="glass p-6 rounded-2xl shadow space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center gap-3">
+            <input id="healthLocationInput" type="text" placeholder="Enter your address, city or coordinates..." class="w-full md:flex-1 px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none">
+            <button id="healthShowMapBtn" class="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-5 py-3 rounded-lg shadow transition">
+                Visualise shadows
+            </button>
+        </div>
+        <div id="healthMap" class="w-full h-[540px] rounded-2xl overflow-hidden border border-slate-200"></div>
+        <div id="healthSolarData" class="text-sm text-slate-600"></div>
+    </div>
+
+    <div class="glass p-6 rounded-2xl shadow">
+        <h2 class="text-xl font-semibold text-slate-800 mb-2">How to use</h2>
+        <ul class="list-disc list-inside space-y-2 text-sm text-slate-500">
+            <li>Pan and zoom the map to select rooftop coordinates identical to the Expo app experience.</li>
+            <li>Use the highlighted solar vector to understand real-time shadow lengths and azimuth.</li>
+            <li>Combine with reminders for cleaning, inspection, and subsidy inspection visits.</li>
+        </ul>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/health.js') }}"></script>
+{% endblock %}
+

@@ -1,0 +1,22 @@
+from __future__ import annotations
+
+import os
+from pathlib import Path
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+class Config:
+    SECRET_KEY = os.environ.get("SOLARIS_SECRET_KEY", "change-me-in-production")
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "DATABASE_URL", f"sqlite:///{BASE_DIR / 'solaris.db'}"
+    )
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    UPLOAD_FOLDER = os.environ.get(
+        "SOLARIS_UPLOAD_FOLDER", str(BASE_DIR / "static" / "uploads")
+    )
+    MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10 MB
+    ENABLE_HTMX = False
+
+

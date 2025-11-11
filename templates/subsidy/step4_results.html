@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto px-6 py-12 space-y-8">
+    <div class="glass rounded-3xl p-8 shadow-lg space-y-6">
+        <h1 class="text-3xl font-bold text-slate-800">Estimate & recommendations</h1>
+        <p class="text-slate-500">
+            Here’s a snapshot of your system sizing, subsidy support and the programmes best suited to your rooftop journey.
+        </p>
+
+        {% include "subsidy/_progress.html" %}
+
+        <div class="grid md:grid-cols-3 gap-4">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-2">
+                <h2 class="text-sm uppercase tracking-wide text-slate-500">Recommended system size</h2>
+                <p class="text-3xl font-semibold text-slate-900">{{ "{:.2f}".format(recommended_kw) }} kW</p>
+                <p class="text-xs text-slate-400">Sized using rooftop area and annual consumption.</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-2">
+                <h2 class="text-sm uppercase tracking-wide text-slate-500">Net investment</h2>
+                <p class="text-3xl font-semibold text-slate-900">₹{{ "{:,.0f}".format(result.net_cost) }}</p>
+                <p class="text-xs text-slate-400">Gross ₹{{ "{:,.0f}".format(result.gross_cost) }} with central ₹{{ "{:,.0f}".format(result.central) }} and state ₹{{ "{:,.0f}".format(result.state_subsidy) }} support.</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-2">
+                <h2 class="text-sm uppercase tracking-wide text-slate-500">Estimated annual savings</h2>
+                <p class="text-3xl font-semibold text-emerald-600">₹{{ "{:,.0f}".format(estimated_annual_savings) }}</p>
+                <p class="text-xs text-slate-400">Based on {{ "{:,.0f}".format(recommended_kw * 1100) }} kWh generation.</p>
+            </div>
+        </div>
+
+        {% if profile_tags %}
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
+            <h2 class="text-sm uppercase tracking-wide text-slate-500 mb-3">Your profile snapshot</h2>
+            <div class="flex flex-wrap gap-2">
+                {% for tag in profile_tags %}
+                    <span class="px-3 py-1 rounded-full bg-sky-100 text-sky-700 text-xs font-semibold">{{ tag }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+            <h2 class="text-lg font-semibold text-slate-800">Filter subsidy programmes</h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="space-y-2">
+                    <p class="text-sm font-semibold text-slate-600">Coverage</p>
+                    <div class="flex flex-wrap gap-2">
+                        {% for link in coverage_links %}
+                            <a href="{{ link.url }}" class="px-3 py-1 text-sm rounded-full border {{ 'bg-sky-500 text-white border-sky-500' if link.active else 'border-slate-200 text-slate-600 hover:border-sky-300' }}">
+                                {{ link.label }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-sm font-semibold text-slate-600">Ownership</p>
+                    <div class="flex flex-wrap gap-2">
+                        {% for link in ownership_links %}
+                            <a href="{{ link.url }}" class="px-3 py-1 text-sm rounded-full border {{ 'bg-sky-500 text-white border-sky-500' if link.active else 'border-slate-200 text-slate-600 hover:border-sky-300' }}">
+                                {{ link.label }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-sm font-semibold text-slate-600">Grid connection</p>
+                    <div class="flex flex-wrap gap-2">
+                        {% for link in grid_links %}
+                            <a href="{{ link.url }}" class="px-3 py-1 text-sm rounded-full border {{ 'bg-sky-500 text-white border-sky-500' if link.active else 'border-slate-200 text-slate-600 hover:border-sky-300' }}">
+                                {{ link.label }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-slate-800">Recommended programmes</h2>
+                <span class="text-sm text-slate-500">Showing {{ matches|length }} of {{ total_matches }} matches</span>
+            </div>
+
+            {% if total_matches == 0 %}
+                <p class="text-sm text-slate-500">We couldn’t find a direct programme match with the information available. Explore central rooftop schemes via the national portal.</p>
+            {% elif matches|length == 0 %}
+                <p class="text-sm text-slate-500">No programmes match the selected filters right now. Try widening your filters to discover more incentives.</p>
+            {% else %}
+                <div class="space-y-4">
+                    {% for scheme in matches %}
+                        <article class="border border-slate-200 rounded-2xl p-6 space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-3">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-slate-800">{{ scheme.name }}</h3>
+                                    <p class="text-sm text-slate-500">Administered by {{ scheme.sponsoring_body }}</p>
+                                </div>
+                                <span class="text-xs uppercase tracking-wide px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">Match {{ "{:.1f}".format(scheme.match_score or 0) }}/10</span>
+                            </div>
+                            <p class="text-sm text-slate-600">{{ scheme.description }}</p>
+                            <dl class="grid md:grid-cols-2 gap-2 text-sm text-slate-600">
+                                <div><strong>Subsidy type:</strong> {{ scheme.subsidy_type }}</div>
+                                <div><strong>Benefit:</strong> {{ scheme.benefit }}</div>
+                                <div><strong>Application:</strong> {{ scheme.application_process }}</div>
+                                <div><strong>Timeline:</strong> {{ scheme.timeline }}</div>
+                                <div><strong>Vendors:</strong> {{ scheme.vendor_info }}</div>
+                                <div><strong>Notes:</strong> {{ scheme.notes }}</div>
+                            </dl>
+                            {% if scheme.reasons %}
+                                <div class="space-y-1">
+                                    <p class="text-sm font-semibold text-slate-700">Why it fits</p>
+                                    <ul class="list-disc list-inside text-sm text-slate-600">
+                                        {% for reason in scheme.reasons %}
+                                            <li>{{ reason }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            <p class="text-sm text-slate-600"><strong>Documents:</strong> {{ scheme.documents_required or "Refer to programme guidelines" }}</p>
+                            <div class="flex flex-wrap gap-2">
+                                {% for tag in scheme.tags or [] %}
+                                    <span class="px-2 py-1 text-xs rounded bg-slate-100 text-slate-500">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            {% if scheme.application_url %}
+                                <a href="{{ scheme.application_url }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm font-semibold text-sky-600 hover:text-sky-700">
+                                    Open portal ↗
+                                </a>
+                            {% else %}
+                                <span class="text-sm text-slate-500">Application details available via your DISCOM / official portal.</span>
+                            {% endif %}
+                        </article>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ url_for('subsidy.site') }}" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold px-5 py-3 rounded-lg shadow transition">
+                Update site details
+            </a>
+            <a href="{{ url_for('tracker.index') }}" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-5 py-3 rounded-lg shadow transition">
+                Open energy tracker
+            </a>
+            <a href="{{ url_for('main.health') }}" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-5 py-3 rounded-lg shadow transition">
+                Open solar tracker
+            </a>
+            <form method="post" action="{{ url_for('subsidy.restart') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-5 py-3 rounded-lg shadow transition">
+                    Start a new journey
+                </button>
+            </form>
+            <a href="{{ url_for('dashboard.index') }}" class="text-sm text-slate-500 hover:text-slate-700">
+                ← Back to dashboard
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
