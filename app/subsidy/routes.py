@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from flask import (
     Blueprint,
     flash,
@@ -197,9 +199,19 @@ def results():
 
     filtered_matches = [scheme for scheme in matches if passes_filters(scheme)]
 
+    estimated_annual_output = recommended_kw * 1100
+    if monthly_bill:
+        estimated_annual_savings = monthly_bill * 12 * 0.6
+    else:
+        estimated_annual_savings = estimated_annual_output * 6
+
+    current_user.last_system_kw = recommended_kw
+    current_user.last_net_cost_inr = result.net_cost
+    current_user.last_estimated_savings_inr = estimated_annual_savings
+    current_user.last_estimate_updated_at = datetime.utcnow()
     if not current_user.journey_completed:
         current_user.journey_completed = True
-        db.session.commit()
+    db.session.commit()
 
     state_label = journey.get("state") or ""
     consumer_segment = journey.get("consumer_segment") or "residential"
@@ -216,12 +228,6 @@ def results():
     profile_tags.append(
         "Grid-connected site" if journey.get("grid_connection") == "grid" else "Off-grid / unreliable grid"
     )
-
-    estimated_annual_output = recommended_kw * 1100
-    if monthly_bill:
-        estimated_annual_savings = monthly_bill * 12 * 0.6
-    else:
-        estimated_annual_savings = estimated_annual_output * 6
 
     return render_template(
         "subsidy/step4_results.html",

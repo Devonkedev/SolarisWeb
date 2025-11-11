@@ -38,12 +38,28 @@ def index():
         .all()
     )
 
+    estimate_summary = {
+        "system_kw": current_user.last_system_kw,
+        "net_cost": current_user.last_net_cost_inr,
+        "savings": current_user.last_estimated_savings_inr,
+        "updated_at": current_user.last_estimate_updated_at,
+    }
+    estimate_stats = None
+    if estimate_summary["system_kw"]:
+        estimate_stats = {
+            "monthly_savings": 8200,
+            "lifetime_savings": 152000,
+            "co2_offset": 1.8,
+        }
+
     return render_template(
         "dashboard/index.html",
         title="Dashboard",
         recent_projects=recent_projects,
         total_generation=total_generation,
         recent_energy=recent_energy,
+        estimate_summary=estimate_summary,
+        estimate_stats=estimate_stats,
         show_tracker_cta=True,
     )
 
