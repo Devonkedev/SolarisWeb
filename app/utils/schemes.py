@@ -348,7 +348,7 @@ def match_subsidy_schemes(
     *,
     state: str,
     consumer_segment: str,
-    owns_property: bool,
+    owns_property: bool | None,
     is_grid_connected: bool,
     roof_area: float | None = None,
     annual_consumption: float | None = None,
@@ -367,10 +367,11 @@ def match_subsidy_schemes(
     for scheme in candidate_schemes:
         if consumer_segment not in scheme.consumer_segments and scheme.consumer_segments:
             continue
-        if scheme.requires_ownership and not owns_property:
-            continue
-        if scheme.requires_ownership is False and owns_property:
-            continue
+        if owns_property is not None:
+            if scheme.requires_ownership and not owns_property:
+                continue
+            if scheme.requires_ownership is False and owns_property:
+                continue
         if scheme.requires_grid_connection is True and not is_grid_connected:
             continue
         if scheme.requires_grid_connection is False and is_grid_connected:

@@ -23,19 +23,11 @@
                 {% endif %}
             </div>
 
-            <div class="grid md:grid-cols-2 gap-4">
-                <div>
-                    <label for="{{ form.consumer_segment.id }}" class="block text-sm font-semibold text-slate-600 mb-1">
-                        {{ form.consumer_segment.label.text }}
-                    </label>
-                    {{ form.consumer_segment(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
-                </div>
-                <div>
-                    <label for="{{ form.ownership.id }}" class="block text-sm font-semibold text-slate-600 mb-1">
-                        {{ form.ownership.label.text }}
-                    </label>
-                    {{ form.ownership(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
-                </div>
+            <div>
+                <label for="{{ form.consumer_segment.id }}" class="block text-sm font-semibold text-slate-600 mb-1">
+                    {{ form.consumer_segment.label.text }}
+                </label>
+                {{ form.consumer_segment(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
             </div>
 
             <div class="grid md:grid-cols-2 gap-4">

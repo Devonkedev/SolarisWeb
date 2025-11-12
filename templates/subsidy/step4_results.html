@@ -20,7 +20,18 @@
             <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm hover:shadow-lg transition-shadow">
                 <h2 class="text-sm uppercase tracking-wide text-slate-500">Recommended system size</h2>
                 <p class="text-3xl font-semibold text-slate-900">{{ "{:.2f}".format(recommended_kw) }} kW</p>
-                <p class="text-xs text-slate-400">Sized using rooftop area and annual consumption.</p>
+                <p class="text-xs text-slate-400">Sized using rooftop area and inferred consumption from your bill.</p>
+                {% if estimated_monthly_units or provider_label %}
+                <p class="text-xs text-slate-400">
+                    {% if estimated_monthly_units %}
+                        ≈ {{ "{:,.0f}".format(estimated_monthly_units) }} units / month
+                    {% endif %}
+                    {% if provider_label %}
+                        {% if estimated_monthly_units %}&nbsp;•&nbsp;{% endif %}
+                        {{ provider_label }}
+                    {% endif %}
+                </p>
+                {% endif %}
             </div>
             <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm hover:shadow-lg transition-shadow">
                 <h2 class="text-sm uppercase tracking-wide text-slate-500">Initial cost</h2>
@@ -172,6 +183,9 @@
                     Start a new journey
                 </button>
             </form>
+            <a href="{{ url_for('subsidy.vendors') }}" class="px-5 py-3 rounded-lg border border-sky-500 text-sm font-semibold text-sky-600 hover:bg-sky-50">
+                Browse vendors page
+            </a>
             <a href="{{ url_for('dashboard.index') }}" class="text-sm text-slate-500 hover:text-slate-700">
                 ← Back to dashboard
             </a>

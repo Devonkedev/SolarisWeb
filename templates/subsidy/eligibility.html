@@ -16,10 +16,6 @@
                     {{ form.state(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-600 mb-1" for="{{ form.ownership.id }}">Ownership</label>
-                    {{ form.ownership(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
-                </div>
-                <div>
                     <label class="block text-sm font-semibold text-slate-600 mb-1" for="{{ form.roof_type.id }}">Roof type</label>
                     {{ form.roof_type(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
                 </div>
@@ -28,9 +24,12 @@
                     {{ form.roof_area(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-600 mb-1" for="{{ form.annual_consumption.id }}">Annual electricity consumption (kWh)</label>
-                    {{ form.annual_consumption(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
-                    <p class="text-xs text-slate-400 mt-1">Optional but helps refine the recommendation.</p>
+                    <label class="block text-sm font-semibold text-slate-600 mb-1" for="{{ form.monthly_bill.id }}">Average monthly electricity bill (₹)</label>
+                    {{ form.monthly_bill(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 mb-1" for="{{ form.provider.id }}">Electricity provider / DISCOM</label>
+                    {{ form.provider(class_="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none bg-white") }}
                 </div>
                 <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-4 py-3 rounded-lg shadow transition">
                     {{ form.submit.label.text }}
