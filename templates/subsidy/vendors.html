@@ -17,8 +17,15 @@
             <p class="text-2xl font-semibold text-slate-900">{{ "{:.1f}".format(recommended_kw) }} kW system target</p>
             {% if estimated_annual_savings %}
                 <p class="text-sm text-slate-500">Projected annual savings: ₹{{ "{:,.0f}".format(estimated_annual_savings) }}</p>
-            {% else %}
-                <p class="text-sm text-slate-500">Tip: share your recent electricity bill with vendors to refine quotes.</p>
+            {% endif %}
+            {% if estimated_monthly_units or provider_label %}
+                <p class="text-xs text-slate-400">
+                    {% if estimated_monthly_units %}Derived from ≈ {{ "{:,.0f}".format(estimated_monthly_units) }} units / month{% endif %}
+                    {% if provider_label %}
+                        {% if estimated_monthly_units %}&nbsp;•&nbsp;{% endif %}
+                        {{ provider_label }}
+                    {% endif %}
+                </p>
             {% endif %}
         </div>
         {% endif %}

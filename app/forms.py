@@ -14,7 +14,9 @@ from wtforms import (
     TextAreaField,
     TimeField,
 )
-from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, NumberRange
+
+from .utils import ELECTRICITY_PROVIDER_CHOICES
 
 
 class LoginForm(FlaskForm):
@@ -104,17 +106,19 @@ class SubsidyNumbersForm(FlaskForm):
         places=2,
         rounding=None,
     )
-    annual_consumption = DecimalField(
-        "Annual electricity consumption (kWh)",
-        validators=[Optional()],
+    monthly_bill = DecimalField(
+        "Average monthly electricity bill (₹)",
+        validators=[
+            DataRequired(message="Please enter your average monthly electricity bill."),
+            NumberRange(min=100, message="Monthly bill should be at least ₹100 to run the estimate."),
+        ],
         places=2,
         rounding=None,
     )
-    monthly_bill = DecimalField(
-        "Average monthly electricity bill (₹)",
-        validators=[Optional()],
-        places=2,
-        rounding=None,
+    provider = SelectField(
+        "Electricity provider / DISCOM",
+        choices=ELECTRICITY_PROVIDER_CHOICES,
+        validators=[DataRequired(message="Select your electricity provider.")],
     )
     submit = SubmitField("Next: Preview savings")
 
@@ -170,11 +174,6 @@ class SubsidySiteForm(FlaskForm):
             ("agricultural", "Agricultural"),
             ("community", "Community / cooperative"),
         ],
-        validators=[DataRequired()],
-    )
-    ownership = SelectField(
-        "Do you own the property?",
-        choices=[("yes", "Yes"), ("no", "No")],
         validators=[DataRequired()],
     )
     grid_connection = SelectField(

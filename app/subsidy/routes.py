@@ -19,7 +19,11 @@ from ..utils import (
     estimate_subsidy,
     estimate_system_size_kw,
     match_subsidy_schemes,
+    estimate_monthly_units_from_bill,
+    get_provider_label,
+    get_provider_tariff,
     get_scheme_filter_options,
+    solar_vendors,
 )
 
 subsidy_bp = Blueprint("subsidy", __name__, url_prefix="/subsidy")
@@ -46,14 +50,14 @@ def eligibility():
     if form.validate_on_submit():
         journey = _ensure_session()
         roof_area = float(form.roof_area.data or 0)
-        annual_consumption = float(form.annual_consumption.data or 0)
         monthly_bill = float(form.monthly_bill.data or 0)
+        provider = form.provider.data or ""
 
         journey.update(
             {
                 "roof_area": roof_area,
-                "annual_consumption": annual_consumption,
                 "monthly_bill": monthly_bill,
+                "provider": provider,
             }
         )
         session.modified = True
@@ -81,7 +85,6 @@ def site():
             {
                 "state": form.state.data,
                 "consumer_segment": form.consumer_segment.data,
-                "ownership": form.ownership.data,
                 "grid_connection": form.grid_connection.data,
                 "roof_type": form.roof_type.data or "",
             }
@@ -101,14 +104,25 @@ def site():
 @login_required
 def results():
     journey = _ensure_session()
-    required_keys = {"roof_area", "state", "consumer_segment", "ownership", "grid_connection"}
+    required_keys = {
+        "roof_area",
+        "state",
+        "consumer_segment",
+        "grid_connection",
+        "provider",
+        "monthly_bill",
+    }
     if not required_keys.issubset(journey.keys()):
         flash("Complete the subsidy journey before viewing matches.", "error")
         return redirect(url_for("subsidy.eligibility"))
 
     roof_area = journey.get("roof_area", 0.0)
-    annual_consumption = journey.get("annual_consumption", 0.0)
     monthly_bill = journey.get("monthly_bill", 0.0)
+    provider_key = journey.get("provider")
+
+    estimated_monthly_units = estimate_monthly_units_from_bill(monthly_bill, provider_key)
+    annual_consumption = estimated_monthly_units * 12 if estimated_monthly_units else None
+
     recommended_kw = estimate_system_size_kw(
         roof_area=roof_area or None,
         annual_consumption_kwh=annual_consumption or None,
@@ -118,7 +132,7 @@ def results():
     matches = match_subsidy_schemes(
         state=journey.get("state") or "",
         consumer_segment=journey.get("consumer_segment") or "residential",
-        owns_property=journey.get("ownership") == "yes",
+        owns_property=journey.get("ownership") if "ownership" in journey else None,
         is_grid_connected=journey.get("grid_connection") == "grid",
         roof_area=roof_area or None,
         annual_consumption=annual_consumption or None,
@@ -200,7 +214,11 @@ def results():
     filtered_matches = [scheme for scheme in matches if passes_filters(scheme)]
 
     estimated_annual_output = recommended_kw * 1100
-    if monthly_bill:
+    if annual_consumption:
+        tariff = get_provider_tariff(provider_key)
+        offset_kwh = min(annual_consumption, estimated_annual_output)
+        estimated_annual_savings = offset_kwh * tariff
+    elif monthly_bill:
         estimated_annual_savings = monthly_bill * 12 * 0.6
     else:
         estimated_annual_savings = estimated_annual_output * 6
@@ -220,14 +238,18 @@ def results():
         "agricultural": "Agricultural",
         "community": "Community / cooperative",
     }
+    provider_label = get_provider_label(provider_key)
     profile_tags = []
     if state_label:
         profile_tags.append(state_label.title())
     profile_tags.append(segment_labels.get(consumer_segment, consumer_segment.title()))
-    profile_tags.append("Owner occupied" if journey.get("ownership") == "yes" else "Tenant / shared ownership")
     profile_tags.append(
         "Grid-connected site" if journey.get("grid_connection") == "grid" else "Off-grid / unreliable grid"
     )
+    if provider_label:
+        profile_tags.append(provider_label)
+    if estimated_monthly_units:
+        profile_tags.append(f"{round(estimated_monthly_units):,} units / month")
 
     return render_template(
         "subsidy/step4_results.html",
@@ -237,6 +259,8 @@ def results():
         roof_area=roof_area,
         annual_consumption=annual_consumption,
         monthly_bill=monthly_bill,
+        estimated_monthly_units=estimated_monthly_units,
+        provider_label=provider_label,
         result=result,
         matches=filtered_matches,
         total_matches=len(matches),
@@ -247,6 +271,46 @@ def results():
         grid_links=grid_links,
         current_filters=current_filters,
         show_tracker_cta=True,
+    )
+
+
+@subsidy_bp.route("/vendors", methods=["GET"])
+@login_required
+def vendors():
+    journey = _ensure_session()
+    roof_area = journey.get("roof_area")
+    monthly_bill = journey.get("monthly_bill")
+    provider_key = journey.get("provider")
+    estimated_monthly_units = estimate_monthly_units_from_bill(monthly_bill, provider_key)
+    annual_consumption = estimated_monthly_units * 12 if estimated_monthly_units else None
+
+    recommended_kw = None
+    estimated_annual_savings = None
+    provider_label = get_provider_label(provider_key)
+
+    if roof_area or annual_consumption:
+        recommended_kw = estimate_system_size_kw(
+            roof_area=roof_area or None,
+            annual_consumption_kwh=annual_consumption or None,
+        )
+        estimated_annual_output = recommended_kw * 1100
+        if annual_consumption:
+            tariff = get_provider_tariff(provider_key)
+            offset_kwh = min(annual_consumption, estimated_annual_output)
+            estimated_annual_savings = offset_kwh * tariff
+        elif monthly_bill:
+            estimated_annual_savings = monthly_bill * 12 * 0.6
+        else:
+            estimated_annual_savings = estimated_annual_output * 6
+
+    return render_template(
+        "subsidy/vendors.html",
+        title="Installer Marketplace",
+        vendors=solar_vendors,
+        recommended_kw=recommended_kw,
+        estimated_annual_savings=estimated_annual_savings,
+        estimated_monthly_units=estimated_monthly_units,
+        provider_label=provider_label,
     )
 
 
