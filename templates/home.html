@@ -109,24 +109,76 @@
 </section>
 
 <section id="solar-map" class="py-20 bg-gradient-to-b from-sky-50 to-white">
-    <div class="max-w-6xl mx-auto px-6 text-center">
-        <h2 class="text-3xl font-bold mb-6 text-slate-800">Solar Tracking & Shadow Map</h2>
-        <p class="text-slate-600 mb-8">
-            Visualize sunlight angles and projected shadows for your rooftop, powered by open solar data.
-        </p>
+    <div class="max-w-6xl mx-auto px-6 space-y-10">
+        <div class="flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between md:gap-6">
+            <div class="space-y-3 max-w-2xl">
+                <span class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-cyan-500 font-semibold">
+                    <span class="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
+                    Solar tracking
+                </span>
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">Solar tracking & shadow map</h2>
+                <p class="text-slate-600">
+                    Drop a pin on your rooftop and watch irradiance tiles pulse where production peaks. The browser map now mirrors the Solaris mobile heat map for a seamless experience.
+                </p>
+            </div>
+            <a href="{{ url_for('main.health') }}" class="header-cta header-cta--outline">
+                Open full explorer
+            </a>
+        </div>
 
-        <div class="glass p-4 rounded-2xl shadow-lg">
-            <input id="locationInput" type="text" placeholder="Enter your city or coordinates..."
-                   class="w-full md:w-2/3 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:outline-none mb-4">
-            <button id="showMapBtn" class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg font-medium shadow transition">
-                Show Solar Map
-            </button>
-            <div id="map" class="w-full h-[500px] mt-6 rounded-2xl overflow-hidden border border-slate-200"></div>
-            <p id="solarData" class="mt-4 text-slate-700 text-sm"></p>
+        <div class="glass p-6 md:p-8 rounded-[2.5rem] shadow-xl border border-white/50 space-y-6">
+            <div class="flex flex-col gap-3 md:grid md:grid-cols-[1fr_auto] md:gap-6">
+                <div class="space-y-2">
+                    <label for="healthLocationInput" class="text-xs uppercase tracking-[0.35em] text-slate-400 font-semibold">Pin a rooftop or neighbourhood</label>
+                    <div class="relative flex items-center">
+                        <input id="healthLocationInput" type="text" placeholder="Search address, city or coordinates…" class="w-full rounded-full border border-slate-200 bg-white/80 px-5 py-3 text-sm shadow-inner focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100">
+                        <button id="healthSearchBtn" class="ml-3 inline-flex items-center gap-2 rounded-full bg-sky-500 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-sky-600">
+                            <span>Pin location</span>
+                        </button>
+                    </div>
+                    <p id="healthStatus" class="text-xs text-slate-500"></p>
+                </div>
+                <button id="healthRecenterBtn" class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-600 transition hover:border-cyan-300 hover:text-cyan-700">
+                    <span class="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Use my current location
+                </button>
+            </div>
+
+            <div class="relative rounded-[2.5rem] border border-white/50 shadow-inner overflow-hidden">
+                <div id="healthMap" class="h-[520px] w-full"></div>
+                <div id="healthLoading" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-950/55 text-white backdrop-blur-sm hidden">
+                    <div class="h-9 w-9 rounded-full border-2 border-white/30 border-t-transparent animate-spin"></div>
+                    <p class="text-sm font-semibold tracking-wide uppercase">Calibrating sunlight data…</p>
+                </div>
+                <div class="pointer-events-none absolute bottom-6 left-6 flex flex-col gap-3 rounded-2xl bg-slate-900/80 px-5 py-4 text-white shadow-lg backdrop-blur">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.3em] text-white/60 font-medium">Solar potential</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-[11px] font-semibold tracking-wide uppercase text-white/70">Low</span>
+                        <div id="healthLegendGradient" class="flex h-2.5 w-36 overflow-hidden rounded-full ring-1 ring-white/30"></div>
+                        <span class="text-[11px] font-semibold tracking-wide uppercase text-white/70">High</span>
+                    </div>
+                    <p id="healthLegendDate" class="text-xs text-white/70"></p>
+                </div>
+            </div>
+
+            <div id="healthSolarData" class="grid gap-3 rounded-[1.75rem] border border-slate-200 bg-white/70 p-6 text-sm text-slate-600 shadow-sm md:grid-cols-2">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.35em] text-slate-400 font-semibold">Sunlight snapshot</p>
+                    <p id="healthSolarSnapshot" class="mt-2 text-base font-semibold text-slate-800">—</p>
+                </div>
+                <div>
+                    <p class="text-xs uppercase tracking-[0.35em] text-slate-400 font-semibold">Day timeline</p>
+                    <p id="healthSolarTimeline" class="mt-2 text-base font-semibold text-slate-800">—</p>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 {% endblock %}
 
-{% block extra_scripts %}{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/health.js') }}"></script>
+{% endblock %}
 
