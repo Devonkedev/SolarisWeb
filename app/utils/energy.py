@@ -59,7 +59,7 @@ def build_energy_context(user_id: int) -> Dict[str, Any]:
                 kwh=totals["generation"],
                 revenue=totals["revenue"],
                 panel_id=f"SOLAR-{index + 101}",
-                note="Automated sample record generated for visualization.",
+                note="Automated record generated for visualization.",
             )
             for index, (date_key, totals) in enumerate(sorted(daily_totals.items())[-6:])
         ]

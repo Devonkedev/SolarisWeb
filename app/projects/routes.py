@@ -103,7 +103,7 @@ def project_detail(project_id: int):
     if projects_context["has_real_projects"]:
         project = Project.query.filter_by(id=project_id, user_id=current_user.id).first_or_404()
     else:
-        abort(404, description="Project not found. Demo projects cannot be viewed in detail.")
+        abort(404, description="Project not found.")
     
     return render_template(
         "projects/detail.html",

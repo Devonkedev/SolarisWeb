@@ -12,14 +12,8 @@
             <h2 class="text-lg font-semibold text-slate-700">Energy tracker</h2>
             <p class="text-4xl font-bold text-slate-900">{{ "{:,.1f}".format(total_generation or 0) }}</p>
             <p class="text-sm text-slate-500">kWh logged as generation</p>
-            {% if energy_simulated %}
-                <p class="mt-2 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-sky-600">
-                    <span class="h-2 w-2 rounded-full bg-sky-500"></span>
-                    Demo data
-                </p>
-            {% endif %}
             <a href="{{ url_for('tracker.index') }}" class="inline-flex items-center justify-center w-full mt-4 text-sm font-semibold text-cyan-600 hover:text-cyan-700">
-                View tracker →
+                {{ _('View tracker') }} →
             </a>
         </div>
         <div class="glass p-6 rounded-2xl shadow">
@@ -36,9 +30,14 @@
                     <p class="text-xs text-slate-400 mt-3">Last calculated {{ estimate_summary.updated_at.strftime('%d %b %Y') }}. Re-run if your numbers changed.</p>
                 {% endif %}
             {% else %}
-                <p class="text-sm text-slate-500 mt-2">Need an updated subsidy projection?</p>
+                <p class="text-sm text-slate-500 mt-2">{{ _('Need an updated subsidy projection?') }}</p>
                 <a href="{{ url_for('subsidy.eligibility') }}" class="inline-flex items-center justify-center w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-4 py-3 rounded-lg mt-4">
-                    Run subsidy estimator
+                    {{ _('Run subsidy estimator') }}
+                </a>
+            {% endif %}
+            {% if current_user.journey_completed %}
+                <a href="{{ url_for('subsidy.view_data') }}" class="inline-flex items-center justify-center w-full mt-3 text-sm font-semibold text-cyan-600 hover:text-cyan-700 border border-cyan-200 rounded-lg px-4 py-2">
+                    {{ _('View subsidy form data') }} →
                 </a>
             {% endif %}
         </div>
@@ -47,7 +46,7 @@
             <p class="text-4xl font-bold text-slate-900">{{ recent_projects|length }}</p>
             <p class="text-sm text-slate-500">Active solar projects tracked</p>
             <a href="{{ url_for('projects.list_projects') }}" class="inline-flex items-center justify-center w-full mt-4 text-sm font-semibold text-cyan-600 hover:text-cyan-700">
-                View projects →
+                {{ _('View projects') }} →
             </a>
         </div>
     </div>
@@ -64,11 +63,6 @@
                     Updated {{ energy_chart_series|length }} day trend
                 </div>
             </div>
-            {% if energy_simulated %}
-                <div class="bg-sky-50 border border-sky-200 text-sky-700 px-4 py-3 rounded-xl">
-                    Preview mode: sample readings power these charts until you log real tracker entries.
-                </div>
-            {% endif %}
             <div class="grid gap-6 xl:grid-cols-3">
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm xl:col-span-2">
                     <div class="flex items-center justify-between mb-4">
@@ -117,7 +111,7 @@
             <p class="text-sm text-slate-500 mt-2">Monitor real-time sun paths, shadow lengths and solar window for your rooftop.</p>
         </div>
         <a href="{{ url_for('main.map') }}" class="inline-flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-5 py-3 rounded-lg shadow">
-            Open solar tracker
+            {{ _('Open solar tracker') }}
         </a>
     </div>
     {% endif %}
@@ -126,11 +120,8 @@
         <div class="glass p-6 rounded-2xl shadow space-y-4">
             <div class="flex items-center justify-between">
                 <h3 class="text-xl font-semibold text-slate-800">Recent tracker entries</h3>
-                <a href="{{ url_for('tracker.add_entry') }}" class="text-sm text-cyan-600 hover:text-cyan-700">Add entry</a>
+                <a href="{{ url_for('tracker.add_entry') }}" class="text-sm text-cyan-600 hover:text-cyan-700">{{ _('Add entry') }}</a>
             </div>
-            {% if energy_simulated %}
-                <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Demo sample entries shown below</p>
-            {% endif %}
             {% if recent_energy %}
                 <ul class="space-y-3">
                     {% for log in recent_energy %}
@@ -156,7 +147,7 @@
         <div class="glass p-6 rounded-2xl shadow space-y-4">
             <div class="flex items-center justify-between">
                 <h3 class="text-xl font-semibold text-slate-800">Recent projects</h3>
-                <a href="{{ url_for('projects.add_project') }}" class="text-sm text-cyan-600 hover:text-cyan-700">Add project</a>
+                <a href="{{ url_for('projects.add_project') }}" class="text-sm text-cyan-600 hover:text-cyan-700">{{ _('Add project') }}</a>
             </div>
             {% if recent_projects %}
                 <ul class="space-y-3">

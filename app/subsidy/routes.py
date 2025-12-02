@@ -1,20 +1,24 @@
 from __future__ import annotations
 
 from datetime import datetime
+import json
 
 from flask import (
     Blueprint,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
     session,
     url_for,
+    current_app,
 )
 from flask_login import current_user, login_required
 
-from ..extensions import db
+from ..extensions import db, csrf
 from ..forms import SubsidyNumbersForm, SubsidySiteForm
+from ..models import SubsidySubmission
 from ..utils import (
     estimate_subsidy,
     estimate_system_size_kw,
@@ -229,6 +233,19 @@ def results():
     current_user.last_estimate_updated_at = datetime.utcnow()
     if not current_user.journey_completed:
         current_user.journey_completed = True
+    
+    # Save subsidy submission data
+    submission = SubsidySubmission(
+        user_id=current_user.id,
+        roof_area=float(journey.get("roof_area", 0)) if journey.get("roof_area") else None,
+        monthly_bill=float(journey.get("monthly_bill", 0)) if journey.get("monthly_bill") else None,
+        provider=journey.get("provider"),
+        state=journey.get("state"),
+        consumer_segment=journey.get("consumer_segment"),
+        grid_connection=journey.get("grid_connection"),
+        roof_type=journey.get("roof_type"),
+    )
+    db.session.add(submission)
     db.session.commit()
 
     state_label = journey.get("state") or ""
@@ -329,3 +346,186 @@ def restart():
     _reset_journey()
     return redirect(url_for("subsidy.eligibility"))
 
+
+@subsidy_bp.route("/ai-chat", methods=["POST"])
+@csrf.exempt
+@login_required
+def ai_chat():
+    """Handle AI chat requests for subsidy form guidance using Google Gemini"""
+    try:
+        import google.generativeai as genai
+        
+        api_key = current_app.config.get("GEMINI_API_KEY")
+        if not api_key:
+            current_app.logger.error("GEMINI_API_KEY not found in config")
+            return jsonify({"error": "Gemini API key not configured. Please set GEMINI_API_KEY environment variable."}), 500
+        
+        current_app.logger.info(f"Using Gemini API key (length: {len(api_key)})")
+        
+        data = request.get_json()
+        user_message = data.get("message", "")
+        step = data.get("step", 1)
+        form_data = data.get("form_data", {})
+        
+        if not user_message:
+            return jsonify({"error": "Message is required"}), 400
+        
+        # Build context-aware system prompt based on the step
+        system_prompts = {
+            1: """You are a helpful AI assistant guiding users through the Indian solar subsidy application form (Step 1: Basic Numbers).
+
+You help users understand:
+- Rooftop area: How to measure usable roof space, excluding tanks, shading, setbacks
+- Monthly electricity bill: Average of recent bills, used to estimate consumption
+- Electricity provider/DISCOM: Their local distribution company
+
+Be friendly, clear, and provide practical advice. Answer questions about requirements, calculations, and what information they need to provide.
+
+You can use markdown formatting to make your responses clearer:
+- Use **bold** for emphasis
+- Use headings (## Heading) to organize information
+- Use bullet points (- item) for lists
+- Use `code` for technical terms or values""",
+            2: """You are a helpful AI assistant guiding users through the Indian solar subsidy application form (Step 2: Site Information).
+
+You help users understand:
+- State: Their location for state-specific subsidies
+- Consumer segment: Residential, Agricultural, or Community/Cooperative
+- Grid connection: Whether they're connected to the grid or off-grid
+- Roof type: Concrete (RCC), Tin/Metal, Tiles, Asbestos, Flat roof, Sloped roof, or Other
+
+Be friendly, clear, and provide practical advice about regional requirements and eligibility.
+
+You can use markdown formatting to make your responses clearer:
+- Use **bold** for emphasis
+- Use headings (## Heading) to organize information
+- Use bullet points (- item) for lists
+- Use `code` for technical terms or values""",
+            3: """You are a helpful AI assistant guiding users through applying for Indian solar subsidies after they've completed the eligibility form.
+
+You help users with:
+- How to apply for the recommended subsidy schemes
+- Required documents for subsidy applications
+- Step-by-step application process for different schemes
+- Timeline expectations for subsidy approval
+- How to contact DISCOM or relevant authorities
+- Understanding subsidy benefits and net costs
+- Next steps after receiving subsidy approval
+- Vendor selection and installation process
+- Net metering application process
+
+Be friendly, clear, and provide actionable, step-by-step guidance. Help them understand the application process, required documents, timelines, and what to expect at each stage. Reference specific schemes when relevant and provide practical next steps.
+
+You can use markdown formatting to make your responses clearer and more organized:
+- Use **bold** for important terms or emphasis
+- Use headings (## Heading, ### Subheading) to structure your response
+- Use bullet points (- item) for lists of documents, steps, or requirements
+- Use `code` for technical terms, amounts, or specific values
+- Organize longer responses with clear sections using headings"""
+        }
+        
+        system_prompt = system_prompts.get(step, system_prompts[1])
+        
+        # Add form context if available
+        context = ""
+        if form_data:
+            context = f"\n\nCurrent form data:\n{json.dumps(form_data, indent=2)}"
+        
+        # If on results page (step 3), add results context from session
+        if step == 3:
+            journey = _ensure_session()
+            if journey:
+                results_context = f"""
+                
+User's subsidy eligibility results:
+- State: {journey.get('state', 'Not specified')}
+- Consumer segment: {journey.get('consumer_segment', 'Not specified')}
+- Grid connection: {journey.get('grid_connection', 'Not specified')}
+- Roof area: {journey.get('roof_area', 'Not specified')} m²
+- Monthly bill: ₹{journey.get('monthly_bill', 'Not specified')}
+- Provider: {journey.get('provider', 'Not specified')}
+
+The user has completed the eligibility form and is now viewing their recommended subsidy schemes. Help them understand how to apply for these schemes, what documents they need, application timelines, and next steps."""
+                context += results_context
+        
+        # Configure Gemini
+        genai.configure(api_key=api_key)
+        
+        # Use gemini-2.0-flash which is available and fast
+        model = genai.GenerativeModel('models/gemini-2.0-flash')
+        
+        # Create the full prompt
+        full_prompt = f"{system_prompt}{context}\n\nUser question: {user_message}"
+        
+        # Generate response
+        response = model.generate_content(
+            full_prompt,
+            generation_config=genai.types.GenerationConfig(
+                temperature=0.7,
+                max_output_tokens=500,
+            )
+        )
+        
+        ai_response = response.text
+        
+        return jsonify({"response": ai_response})
+    
+    except ImportError:
+        return jsonify({"error": "Google Generative AI library not installed. Run: pip install google-generativeai"}), 500
+    except Exception as e:
+        import traceback
+        error_details = str(e)
+        # Log the full error for debugging
+        current_app.logger.error(f"Gemini API error: {error_details}\n{traceback.format_exc()}")
+        # Return error with details
+        error_msg = f"AI service error: {error_details}"
+        if current_app.debug:
+            error_msg += f"\n\nTraceback:\n{traceback.format_exc()}"
+        return jsonify({"error": error_msg}), 500
+
+
+@subsidy_bp.route("/view", methods=["GET"])
+@login_required
+def view_data():
+    journey = _ensure_session()
+    if not journey:
+        flash("No subsidy form data found. Please complete the subsidy journey first.", "error")
+        return redirect(url_for("subsidy.eligibility"))
+    
+    # Get provider label for display
+    provider_key = journey.get("provider")
+    provider_label = get_provider_label(provider_key) if provider_key else None
+    
+    # Format the data for display
+    form_data = {
+        "roof_area": journey.get("roof_area"),
+        "monthly_bill": journey.get("monthly_bill"),
+        "provider": provider_label or provider_key or "Not specified",
+        "state": journey.get("state"),
+        "consumer_segment": journey.get("consumer_segment"),
+        "grid_connection": journey.get("grid_connection"),
+        "roof_type": journey.get("roof_type"),
+    }
+    
+    # Calculate estimates if possible
+    estimated_monthly_units = None
+    if form_data["monthly_bill"] and provider_key:
+        estimated_monthly_units = estimate_monthly_units_from_bill(form_data["monthly_bill"], provider_key)
+    
+    annual_consumption = estimated_monthly_units * 12 if estimated_monthly_units else None
+    
+    recommended_kw = None
+    if form_data["roof_area"] or annual_consumption:
+        recommended_kw = estimate_system_size_kw(
+            roof_area=form_data["roof_area"] or None,
+            annual_consumption_kwh=annual_consumption or None,
+        )
+    
+    return render_template(
+        "subsidy/view_data.html",
+        title="View Subsidy Form Data",
+        form_data=form_data,
+        estimated_monthly_units=estimated_monthly_units,
+        annual_consumption=annual_consumption,
+        recommended_kw=recommended_kw,
+    )

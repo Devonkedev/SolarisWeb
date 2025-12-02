@@ -23,10 +23,10 @@ set DATABASE_URL=sqlite:///custom.db
 - Home landing page with quick estimator, Leaflet-based solar map, and translation-ready layout.
 - Authentication (register/login/logout) backed by Flask-Login.
 - Dashboard summarising reminders, projects, and quick access to estimators.
-- Subsidy estimator replicating the Expo subsidy workflow.
+- Subsidy estimator for solar installation planning.
 - Reminders CRUD with due date/time, categories, and Flash notifications.
 - Solar project logging with file uploads for site photos.
-- Profile page with editable details, health metrics, and notes (mirroring Expo health data capture).
+- Profile page with editable details, health metrics, and notes.
 - Solar health view powered by Leaflet + SunCalc to visualise sun position and shadows.
 
 ## Tech stack
@@ -35,4 +35,4 @@ set DATABASE_URL=sqlite:///custom.db
 - SQLAlchemy + Flask-Migrate (SQLite by default)
 - Flask-WTF & CSRF protection
 - Tailwind via CDN, Leaflet, SunCalc for solar computations
-- Structured blueprints to mirror Expo navigation (auth, dashboard, projects, reminders, profile, subsidy)
+- Structured blueprints for navigation (auth, dashboard, projects, reminders, profile, subsidy)

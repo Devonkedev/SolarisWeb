@@ -1,7 +1,7 @@
 {
   "name": "solarisweb",
   "version": "1.0.0",
-  "description": "This project ports the Expo-based Solaris mobile experience into a multi-page Flask web application. The new stack keeps the same core functionality—subsidy estimation, solar project logging, reminders, and solar-health visualisations—while reusing the redesigned landing page UI.",
+  "description": "Solaris web application for solar project management, subsidy estimation, energy tracking, and solar health visualisations.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

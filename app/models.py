@@ -46,6 +46,13 @@ class User(db.Model, UserMixin):
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
+    subsidy_submissions = db.relationship(
+        "SubsidySubmission",
+        backref="user",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+        order_by="desc(SubsidySubmission.created_at)",
+    )
     last_system_kw = db.Column(db.Float)
     last_net_cost_inr = db.Column(db.Float)
     last_estimated_savings_inr = db.Column(db.Float)
@@ -117,3 +124,15 @@ class EnergyLog(db.Model):
     note = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
+
+class SubsidySubmission(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    roof_area = db.Column(db.Numeric(10, 2))
+    monthly_bill = db.Column(db.Numeric(10, 2))
+    provider = db.Column(db.String(120))
+    state = db.Column(db.String(120))
+    consumer_segment = db.Column(db.String(80))
+    grid_connection = db.Column(db.String(80))
+    roof_type = db.Column(db.String(80))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

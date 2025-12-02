@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto px-6 py-12 space-y-8">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800">{{ _('Subsidy Form Data') }}</h1>
+            <p class="text-slate-500 mt-2">{{ _('View the information you entered for your subsidy application.') }}</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ url_for('subsidy.results') }}" class="inline-flex items-center gap-2 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-4 py-3 rounded-lg shadow transition">
+                {{ _('View Results') }}
+            </a>
+            <a href="{{ url_for('subsidy.eligibility') }}" class="inline-flex items-center gap-2 border border-slate-300 hover:border-cyan-400 hover:text-cyan-600 px-4 py-3 rounded-lg transition">
+                {{ _('Edit Form') }}
+            </a>
+        </div>
+    </div>
+
+    <div class="glass rounded-2xl p-6 shadow space-y-6">
+        <h2 class="text-xl font-semibold text-slate-800">{{ _('Basic Information') }}</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div>
+                <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Rooftop Area') }}</p>
+                <p class="text-lg text-slate-800">
+                    {% if form_data.roof_area %}
+                        {{ "{:.2f}".format(form_data.roof_area) }} m²
+                    {% else %}
+                        —
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Monthly Electricity Bill') }}</p>
+                <p class="text-lg text-slate-800">
+                    {% if form_data.monthly_bill %}
+                        ₹{{ "{:,.2f}".format(form_data.monthly_bill) }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Electricity Provider / DISCOM') }}</p>
+                <p class="text-lg text-slate-800">{{ form_data.provider }}</p>
+            </div>
+            {% if estimated_monthly_units %}
+            <div>
+                <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Estimated Monthly Units') }}</p>
+                <p class="text-lg text-slate-800">{{ "{:,.0f}".format(estimated_monthly_units) }} kWh</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="glass rounded-2xl p-6 shadow space-y-6">
+        <h2 class="text-xl font-semibold text-slate-800">{{ _('Site Information') }}</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div>
+                <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('State') }}</p>
+                <p class="text-lg text-slate-800">{{ form_data.state or '—' }}</p>
+            </div>
+            <div>
+                <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Consumer Segment') }}</p>
+                <p class="text-lg text-slate-800">
+                    {% if form_data.consumer_segment == 'residential' %}
+                        {{ _('Residential') }}
+                    {% elif form_data.consumer_segment == 'agricultural' %}
+                        {{ _('Agricultural') }}
+                    {% elif form_data.consumer_segment == 'community' %}
+                        {{ _('Community / Cooperative') }}
+                    {% else %}
+                        {{ form_data.consumer_segment or '—' }}
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Grid Connection') }}</p>
+                <p class="text-lg text-slate-800">
+                    {% if form_data.grid_connection == 'grid' %}
+                        {{ _('Grid-connected') }}
+                    {% elif form_data.grid_connection == 'off-grid' %}
+                        {{ _('Off-grid / Hybrid') }}
+                    {% else %}
+                        {{ form_data.grid_connection or '—' }}
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Roof Type') }}</p>
+                <p class="text-lg text-slate-800">
+                    {% if form_data.roof_type %}
+                        {% if form_data.roof_type == 'concrete-rcc' %}
+                            {{ _('Concrete (RCC)') }}
+                        {% elif form_data.roof_type == 'tin-metal' %}
+                            {{ _('Tin / Metal') }}
+                        {% elif form_data.roof_type == 'tiles' %}
+                            {{ _('Tiles') }}
+                        {% elif form_data.roof_type == 'asbestos' %}
+                            {{ _('Asbestos') }}
+                        {% elif form_data.roof_type == 'flat-roof' %}
+                            {{ _('Flat roof') }}
+                        {% elif form_data.roof_type == 'sloped-roof' %}
+                            {{ _('Sloped roof') }}
+                        {% else %}
+                            {{ form_data.roof_type }}
+                        {% endif %}
+                    {% else %}
+                        —
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {% if recommended_kw or annual_consumption %}
+    <div class="glass rounded-2xl p-6 shadow space-y-6">
+        <h2 class="text-xl font-semibold text-slate-800">{{ _('Calculated Estimates') }}</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            {% if recommended_kw %}
+            <div>
+                <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Recommended System Size') }}</p>
+                <p class="text-lg text-slate-800">{{ "{:.2f}".format(recommended_kw) }} kW</p>
+            </div>
+            {% endif %}
+            {% if annual_consumption %}
+            <div>
+                <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Estimated Annual Consumption') }}</p>
+                <p class="text-lg text-slate-800">{{ "{:,.0f}".format(annual_consumption) }} kWh</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="flex flex-wrap gap-3">
+        <a href="{{ url_for('dashboard.index') }}" class="text-sm text-slate-500 hover:text-slate-700">
+            ← {{ _('Back to dashboard') }}
+        </a>
+    </div>
+</section>
+{% endblock %}
+

@@ -29,11 +29,6 @@
         </a>
     </div>
 
-    {% if simulated_data %}
-        <div class="bg-sky-50 border border-sky-200 text-sky-700 px-6 py-4 rounded-2xl shadow-inner">
-            Showing automated sample data so you can explore the tracker features before logging your own readings.
-        </div>
-    {% endif %}
 
     <div class="glass p-8 rounded-3xl shadow space-y-6">
         <div class="flex flex-col gap-2">
@@ -84,9 +79,6 @@
 
     <div class="space-y-4">
         <h2 class="text-xl font-semibold text-slate-800">Recent entries</h2>
-        {% if simulated_data %}
-            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Automated sample records (not yet saved)</p>
-        {% endif %}
         {% if logs %}
             <div class="grid gap-4">
                 {% for log in logs %}

@@ -1,0 +1,265 @@
+<div id="ai-chat-container" class="fixed bottom-6 right-6 z-50 hidden md:block">
+    <div id="ai-chat-window" class="hidden bg-white rounded-3xl shadow-2xl border border-slate-200/50 w-[420px] h-[600px] flex flex-col overflow-hidden backdrop-blur-sm">
+        <div class="bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-500 text-white p-5 rounded-t-3xl flex items-center justify-between shadow-lg">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg">{{ _('AI Assistant') }}</h3>
+                    <p class="text-xs text-white/80">{{ _('Your subsidy guide') }}</p>
+                </div>
+            </div>
+            <button id="ai-chat-close" class="text-white/90 hover:text-white hover:bg-white/20 rounded-lg p-1.5 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div id="ai-chat-messages" class="flex-1 overflow-y-auto p-5 space-y-4 bg-gradient-to-b from-slate-50 to-white">
+            <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-sky-500 flex items-center justify-center flex-shrink-0 shadow-md">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                </div>
+                <div class="flex-1 bg-white rounded-2xl rounded-tl-sm p-4 shadow-md border border-slate-100">
+                    {% if step == 3 %}
+                    <p class="text-sm text-slate-700 leading-relaxed">{{ _('Hello! I\'m here to help you apply for the recommended subsidy schemes. Ask me about application processes, required documents, timelines, or next steps.') }}</p>
+                    {% else %}
+                    <p class="text-sm text-slate-700 leading-relaxed">{{ _('Hello! I\'m here to help guide you through the subsidy form. Ask me anything about the requirements or how to fill out the form.') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-4 border-t border-slate-200 bg-white rounded-b-3xl">
+            <form id="ai-chat-form" class="flex gap-2">
+                <input 
+                    type="text" 
+                    id="ai-chat-input" 
+                    placeholder="{{ _('Ask a question...') }}"
+                    class="flex-1 px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none text-sm bg-slate-50 focus:bg-white transition"
+                    autocomplete="off"
+                />
+                <button 
+                    type="submit" 
+                    id="ai-chat-send"
+                    class="bg-gradient-to-r from-cyan-500 to-sky-500 hover:from-cyan-600 hover:to-sky-600 text-white px-5 py-3 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                </button>
+            </form>
+            <div id="ai-chat-loading" class="hidden mt-3 text-xs text-slate-500 flex items-center gap-2 px-1">
+                <svg class="animate-spin h-4 w-4 text-cyan-500" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-cyan-600 font-medium">{{ _('AI is thinking...') }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <button 
+        id="ai-chat-toggle" 
+        class="bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-500 text-white rounded-full p-5 shadow-xl hover:shadow-2xl transition-all hover:scale-110 flex items-center justify-center group"
+        title="{{ _('Open AI Assistant') }}"
+    >
+        <svg class="w-7 h-7 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+        </svg>
+    </button>
+</div>
+
+<script>
+(function() {
+    const chatContainer = document.getElementById('ai-chat-container');
+    const chatWindow = document.getElementById('ai-chat-window');
+    const chatToggle = document.getElementById('ai-chat-toggle');
+    const chatClose = document.getElementById('ai-chat-close');
+    const chatForm = document.getElementById('ai-chat-form');
+    const chatInput = document.getElementById('ai-chat-input');
+    const chatMessages = document.getElementById('ai-chat-messages');
+    const chatLoading = document.getElementById('ai-chat-loading');
+    
+    if (!chatContainer) return;
+    
+    // Get current step from page
+    const currentStep = {{ step|default(1)|int }};
+    
+    // Get current form data and results data
+    function getFormData() {
+        const formData = {};
+        const roofArea = document.querySelector('input[name="roof_area"]');
+        const monthlyBill = document.querySelector('input[name="monthly_bill"]');
+        const provider = document.querySelector('select[name="provider"]');
+        const state = document.querySelector('select[name="state"]');
+        const consumerSegment = document.querySelector('select[name="consumer_segment"]');
+        const gridConnection = document.querySelector('select[name="grid_connection"]');
+        const roofType = document.querySelector('select[name="roof_type"]');
+        
+        if (roofArea) formData.roof_area = roofArea.value;
+        if (monthlyBill) formData.monthly_bill = monthlyBill.value;
+        if (provider) formData.provider = provider.value;
+        if (state) formData.state = state.value;
+        if (consumerSegment) formData.consumer_segment = consumerSegment.value;
+        if (gridConnection) formData.grid_connection = gridConnection.value;
+        if (roofType) formData.roof_type = roofType.value;
+        
+        // If on results page, include results data
+        if (currentStep === 3) {
+            const recommendedKw = document.querySelector('.text-3xl.font-semibold.text-slate-900');
+            const subsidyAmount = document.querySelector('.text-\\[2\\.25rem\\].font-black');
+            const netCost = document.querySelector('.text-3xl.font-semibold.text-slate-900');
+            
+            // Try to extract key information from results page
+            const resultsText = document.body.innerText;
+            if (resultsText.includes('Recommended system size')) {
+                formData.on_results_page = true;
+            }
+        }
+        
+        return formData;
+    }
+    
+    // Toggle chat window
+    chatToggle?.addEventListener('click', () => {
+        chatWindow?.classList.toggle('hidden');
+        if (!chatWindow?.classList.contains('hidden')) {
+            chatInput?.focus();
+        }
+    });
+    
+    chatClose?.addEventListener('click', () => {
+        chatWindow?.classList.add('hidden');
+    });
+    
+    // Simple markdown parser for headings, bold, lists, etc.
+    function parseMarkdown(text) {
+        let html = text;
+        
+        // Headers
+        html = html.replace(/^### (.*$)/gim, '<h3 class="text-base font-bold text-slate-900 mt-3 mb-2">$1</h3>');
+        html = html.replace(/^## (.*$)/gim, '<h2 class="text-lg font-bold text-slate-900 mt-4 mb-2">$1</h2>');
+        html = html.replace(/^# (.*$)/gim, '<h1 class="text-xl font-bold text-slate-900 mt-4 mb-3">$1</h1>');
+        
+        // Bold
+        html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-slate-900">$1</strong>');
+        html = html.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+        
+        // Lists
+        html = html.replace(/^\- (.*$)/gim, '<li class="ml-4 mb-1">• $1</li>');
+        html = html.replace(/^\d+\. (.*$)/gim, '<li class="ml-4 mb-1 list-decimal">$1</li>');
+        
+        // Wrap consecutive list items in ul
+        html = html.replace(/(<li class="[^"]*">.*<\/li>\n?)+/g, function(match) {
+            return '<ul class="list-none space-y-1 my-2">' + match + '</ul>';
+        });
+        
+        // Code blocks
+        html = html.replace(/`([^`]+)`/g, '<code class="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-800">$1</code>');
+        
+        // Line breaks
+        html = html.replace(/\n\n/g, '</p><p class="mt-2">');
+        html = html.replace(/\n/g, '<br>');
+        
+        // Wrap in paragraph if not already wrapped
+        if (!html.startsWith('<h') && !html.startsWith('<ul') && !html.startsWith('<p')) {
+            html = '<p>' + html + '</p>';
+        }
+        
+        return html;
+    }
+    
+    // Add message to chat
+    function addMessage(text, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `flex items-start gap-3 ${isUser ? 'flex-row-reverse' : ''}`;
+        
+        if (!isUser) {
+            messageDiv.innerHTML = `
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-sky-500 flex items-center justify-center flex-shrink-0 shadow-md">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                </div>
+                <div class="flex-1 bg-white rounded-2xl rounded-tl-sm p-4 shadow-md border border-slate-100">
+                    <div class="text-sm text-slate-700 leading-relaxed prose prose-sm max-w-none">${parseMarkdown(text)}</div>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="flex-1 bg-gradient-to-r from-cyan-500 to-sky-500 text-white rounded-2xl rounded-tr-sm p-4 shadow-md">
+                    <p class="text-sm leading-relaxed">${text}</p>
+                </div>
+            `;
+        }
+        
+        chatMessages?.appendChild(messageDiv);
+        chatMessages?.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+    }
+    
+    // Handle form submission
+    chatForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const message = chatInput?.value.trim();
+        if (!message) return;
+        
+        // Add user message
+        addMessage(message, true);
+        chatInput.value = '';
+        chatLoading?.classList.remove('hidden');
+        
+        try {
+            const formData = getFormData();
+            
+            // Get CSRF token from meta tag or form
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || 
+                             document.querySelector('input[name="csrf_token"]')?.value || '';
+            
+            const response = await fetch('{{ url_for("subsidy.ai_chat") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    message: message,
+                    step: currentStep,
+                    form_data: formData
+                })
+            });
+            
+            if (!response.ok) {
+                // Try to parse error response
+                let errorMsg = 'Sorry, I encountered an error. Please try again later.';
+                try {
+                    const errorData = await response.json();
+                    errorMsg = errorData.error || errorMsg;
+                } catch (e) {
+                    errorMsg = `Server error: ${response.status} ${response.statusText}`;
+                }
+                addMessage(errorMsg);
+                console.error('API Error:', response.status, errorMsg);
+                return;
+            }
+            
+            const data = await response.json();
+            addMessage(data.response);
+        } catch (error) {
+            console.error('Chat error:', error);
+            addMessage('Sorry, I couldn\'t connect to the AI service. Error: ' + (error.message || 'Unknown error'));
+        } finally {
+            chatLoading?.classList.add('hidden');
+        }
+    });
+})();
+</script>
+

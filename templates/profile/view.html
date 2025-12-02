@@ -4,97 +4,129 @@
 <section class="max-w-5xl mx-auto px-6 py-12 space-y-10">
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
         <div>
-            <p class="text-sm text-slate-500">Member since {{ current_user.created_at.strftime('%d %b %Y') }}</p>
-            <h1 class="text-3xl font-bold text-slate-800">Profile</h1>
-            <p class="text-slate-500 mt-2">Review personal details, subsidy contacts and health logs, just like the Expo profile module.</p>
+            <p class="text-sm text-slate-500">{{ _('Member since') }} {{ current_user.created_at.strftime('%d %b %Y') }}</p>
+            <h1 class="text-3xl font-bold text-slate-800">{{ _('Profile') }}</h1>
+            <p class="text-slate-500 mt-2">{{ _('Review personal details and subsidy contacts.') }}</p>
         </div>
         <a href="{{ url_for('profile.edit_profile') }}" class="inline-flex items-center gap-2 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-4 py-3 rounded-lg shadow transition">
-            Edit profile
+            {{ _('Edit profile') }}
         </a>
     </div>
 
     <div class="glass rounded-2xl p-6 shadow grid gap-6 md:grid-cols-2">
         <div>
-            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">Name</p>
+            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Name') }}</p>
             <p class="text-lg text-slate-800">{{ current_user.name or '—' }}</p>
         </div>
         <div>
-            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">Email</p>
+            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Email') }}</p>
             <p class="text-lg text-slate-800">{{ current_user.email }}</p>
         </div>
         <div>
-            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">Phone</p>
+            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Phone') }}</p>
             <p class="text-lg text-slate-800">{{ current_user.phone or '—' }}</p>
         </div>
         <div>
-            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">Date of birth</p>
+            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Date of birth') }}</p>
             <p class="text-lg text-slate-800">{{ current_user.dob.strftime('%d %b %Y') if current_user.dob else '—' }}</p>
         </div>
     </div>
 
-    <div class="grid gap-10 md:grid-cols-2">
-        <div class="space-y-6">
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold text-slate-800">Health metrics</h2>
-            </div>
-            <div class="space-y-3">
-                {% if stats %}
-                    {% for stat in stats %}
-                        <div class="glass rounded-xl px-4 py-3 shadow flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-semibold text-slate-700">{{ stat.label }}</p>
-                                <p class="text-xs text-slate-400">{{ stat.created_at.strftime('%d %b %Y %H:%M') }}</p>
-                            </div>
-                            <span class="text-lg font-semibold text-cyan-600">{{ stat.value }}</span>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-sm text-slate-500">No metrics logged yet.</p>
-                {% endif %}
-            </div>
-            <div class="glass rounded-2xl p-5 shadow">
-                <h3 class="text-lg font-semibold text-slate-800 mb-3">Add metric</h3>
-                <form method="post" action="{{ url_for('profile.add_health_stat') }}" class="space-y-3">
-                    {{ stat_form.hidden_tag() }}
-                    <label class="block text-sm font-semibold text-slate-600 mb-1" for="{{ stat_form.label.id }}">{{ stat_form.label.label.text }}</label>
-                    {{ stat_form.label(class_="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
-                    <label class="block text-sm font-semibold text-slate-600 mb-1" for="{{ stat_form.value.id }}">{{ stat_form.value.label.text }}</label>
-                    {{ stat_form.value(class_="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
-                    <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-4 py-2 rounded-lg transition">
-                        {{ stat_form.submit.label.text }}
-                    </button>
-                </form>
-            </div>
+    <div class="glass rounded-2xl p-6 shadow space-y-6">
+        <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold text-slate-800">{{ _('Subsidy Form Submissions') }}</h2>
         </div>
-
-        <div class="space-y-6">
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold text-slate-800">Health notes</h2>
-            </div>
-            <div class="space-y-3 max-h-80 overflow-y-auto pr-2">
-                {% if logs %}
-                    {% for log in logs %}
-                        <div class="glass rounded-xl px-4 py-3 shadow">
-                            <p class="text-sm text-slate-700">{{ log.note }}</p>
-                            <p class="text-xs text-slate-400 mt-2">{{ log.created_at.strftime('%d %b %Y %H:%M') }}</p>
+        {% if subsidy_submissions %}
+        <div class="space-y-4">
+            {% for submission in subsidy_submissions %}
+                <div class="border border-slate-200 rounded-xl p-5 bg-white">
+                    <div class="flex items-center justify-between mb-4">
+                        <p class="text-sm text-slate-500">{{ _('Submitted') }} {{ submission.created_at.strftime('%d %b %Y %H:%M') }}</p>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        {% if submission.roof_area %}
+                        <div>
+                            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Rooftop Area') }}</p>
+                            <p class="text-base text-slate-800">{{ "{:.2f}".format(submission.roof_area) }} m²</p>
                         </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-sm text-slate-500">No logs captured yet.</p>
-                {% endif %}
-            </div>
-            <div class="glass rounded-2xl p-5 shadow">
-                <h3 class="text-lg font-semibold text-slate-800 mb-3">Add log</h3>
-                <form method="post" action="{{ url_for('profile.add_health_log') }}" class="space-y-3">
-                    {{ log_form.hidden_tag() }}
-                    <label class="block text-sm font-semibold text-slate-600 mb-1" for="{{ log_form.note.id }}">{{ log_form.note.label.text }}</label>
-                    {{ log_form.note(class_="w-full px-4 py-3 border border-slate-200 rounded-lg h-28 focus:ring-2 focus:ring-cyan-300 focus:outline-none") }}
-                    <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-4 py-2 rounded-lg transition">
-                        {{ log_form.submit.label.text }}
-                    </button>
-                </form>
-            </div>
+                        {% endif %}
+                        {% if submission.monthly_bill %}
+                        <div>
+                            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Monthly Bill') }}</p>
+                            <p class="text-base text-slate-800">₹{{ "{:,.2f}".format(submission.monthly_bill) }}</p>
+                        </div>
+                        {% endif %}
+                        {% if submission.provider %}
+                        <div>
+                            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Electricity Provider') }}</p>
+                            <p class="text-base text-slate-800">{{ submission.provider }}</p>
+                        </div>
+                        {% endif %}
+                        {% if submission.state %}
+                        <div>
+                            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('State') }}</p>
+                            <p class="text-base text-slate-800">{{ submission.state }}</p>
+                        </div>
+                        {% endif %}
+                        {% if submission.consumer_segment %}
+                        <div>
+                            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Consumer Segment') }}</p>
+                            <p class="text-base text-slate-800">
+                                {% if submission.consumer_segment == 'residential' %}
+                                    {{ _('Residential') }}
+                                {% elif submission.consumer_segment == 'agricultural' %}
+                                    {{ _('Agricultural') }}
+                                {% elif submission.consumer_segment == 'community' %}
+                                    {{ _('Community / Cooperative') }}
+                                {% else %}
+                                    {{ submission.consumer_segment }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% endif %}
+                        {% if submission.grid_connection %}
+                        <div>
+                            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Grid Connection') }}</p>
+                            <p class="text-base text-slate-800">
+                                {% if submission.grid_connection == 'grid' %}
+                                    {{ _('Grid-connected') }}
+                                {% elif submission.grid_connection == 'off-grid' %}
+                                    {{ _('Off-grid / Hybrid') }}
+                                {% else %}
+                                    {{ submission.grid_connection }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% endif %}
+                        {% if submission.roof_type %}
+                        <div>
+                            <p class="text-xs uppercase font-semibold text-slate-400 mb-1">{{ _('Roof Type') }}</p>
+                            <p class="text-base text-slate-800">
+                                {% if submission.roof_type == 'concrete-rcc' %}
+                                    {{ _('Concrete (RCC)') }}
+                                {% elif submission.roof_type == 'tin-metal' %}
+                                    {{ _('Tin / Metal') }}
+                                {% elif submission.roof_type == 'tiles' %}
+                                    {{ _('Tiles') }}
+                                {% elif submission.roof_type == 'asbestos' %}
+                                    {{ _('Asbestos') }}
+                                {% elif submission.roof_type == 'flat-roof' %}
+                                    {{ _('Flat roof') }}
+                                {% elif submission.roof_type == 'sloped-roof' %}
+                                    {{ _('Sloped roof') }}
+                                {% else %}
+                                    {{ submission.roof_type }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
         </div>
+        {% else %}
+        <p class="text-sm text-slate-500">{{ _('No subsidy submissions yet. Complete the subsidy form to see your data here.') }}</p>
+        {% endif %}
     </div>
 </section>
 {% endblock %}
