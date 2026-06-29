@@ -9,9 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 class Config:
     SECRET_KEY = os.environ.get("SOLARIS_SECRET_KEY", "change-me-in-production")
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL", f"sqlite:///{BASE_DIR / 'solaris.db'}"
-    )
+    _db_url = os.environ.get("DATABASE_URL", f"sqlite:///{BASE_DIR / 'solaris.db'}")
+    SQLALCHEMY_DATABASE_URI = _db_url.replace("postgres://", "postgresql://", 1)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER = os.environ.get(
         "SOLARIS_UPLOAD_FOLDER", str(BASE_DIR / "static" / "uploads")
